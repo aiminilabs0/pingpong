@@ -24,13 +24,72 @@
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+        .tabs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .tab {
+            appearance: none;
+            border: 1px solid rgba(0,0,0,0.18);
+            background: rgba(255,255,255,0.55);
+            color: #111;
+            border-radius: 999px;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            user-select: none;
+            transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+        }
+        .tab:hover {
+            background: rgba(255,255,255,0.8);
+            border-color: rgba(0,0,0,0.25);
+        }
+        .tab:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.35);
+        }
+        .tab.active {
+            background: rgba(255,255,255,0.95);
+            border-color: rgba(0,0,0,0.35);
+        }
+        .tab img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+        .canvas-wrap {
+            position: relative;
+            flex: 1;
         }
     </style>
 </head>
 <body>
 
 <div class="chart-container">
-    <canvas id="rubberChart"></canvas>
+    <div class="tabs" role="tablist" aria-label="Brand">
+        <button class="tab active" type="button" role="tab" aria-selected="true" data-brand="Butterfly">
+            <img src="images/butterfly.ico" alt="" aria-hidden="true" />
+            Butterfly
+        </button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-brand="Tibhar">
+            <img src="images/tibhar.png" alt="" aria-hidden="true" />
+            Tibhar
+        </button>
+    </div>
+    <div class="canvas-wrap">
+        <canvas id="rubberChart"></canvas>
+    </div>
 </div>
 
 <script>
@@ -46,6 +105,13 @@
     const TIBHAR = 'Tibhar';
     const TIBHAR_COLOR = '#d32f2f';
     const TIBHAR_ICON = 'images/tibhar.png';
+
+    // Axis ranges per brand (used by the tabs).
+    // Tune these numbers if you want a tighter/looser zoom per brand.
+    const BRAND_AXIS_RANGES = {
+        [BUTTERFLY]: { xMin: 50,  xMax: 110, yMin: 50,  yMax: 100 },
+        [TIBHAR]:    { xMin: 110, xMax: 135, yMin: 110, yMax: 135 },
+    };
     
     // Each rubber can optionally include a `url` for manual product links:
     // { x, y, label, color, shape, url: 'https://...' }
@@ -75,36 +141,27 @@
     // Example:
     const tibharRubbers = [
         // NOTE: input format provided as "Speed (y) then Spin (x)"
-        { x: 90, y: 93, label: 'EL-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 92, y: 91, label: 'EL-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 90, y: 87, label: 'EL-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 88, y: 87, label: 'FX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 91, y: 86, label: 'FX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 92, y: 87, label: 'FX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 91, y: 93, label: 'MX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 93, y: 95, label: 'MX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 94, y: 93, label: 'MX-P 50',   color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 95, y: 92, label: 'MX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 92, y: 87, label: 'K3',        color: TIBHAR_COLOR, shape: 'circle', url: '' },
-        { x: 94, y: 89, label: 'K3 FX',     color: TIBHAR_COLOR, shape: 'circle', url: '' },
-        { x: 93, y: 96, label: 'K3 Pro',    color: TIBHAR_COLOR, shape: 'circle', url: '' },
-        { x: 91, y: 89, label: 'MK',        color: TIBHAR_COLOR, shape: 'circle', url: '' },
-        { x: 91, y: 86, label: 'MK FX',     color: TIBHAR_COLOR, shape: 'circle', url: '' },
-        { x: 95, y: 93, label: 'MK Pro',    color: TIBHAR_COLOR, shape: 'circle', url: '' },
-        { x: 92, y: 90, label: 'MX-K',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 95, y: 91, label: 'MX-K H',    color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 120, y: 124, label: 'EL-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 117, y: 121, label: 'EL-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 120, y: 123, label: 'EL-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 118, y: 120, label: 'FX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 115, y: 120, label: 'FX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 117, y: 118, label: 'FX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 122, y: 130, label: 'MX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 122, y: 125, label: 'MX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 120, y: 128, label: 'MX-P 50',   color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 124, y: 125, label: 'MX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 130, y: 118, label: 'K3',        color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 130, y: 115, label: 'K3 FX',     color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 130, y: 125, label: 'K3 Pro',    color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 120, y: 124, label: 'MK',        color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 118, y: 118, label: 'MK FX',     color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 124, y: 130, label: 'MK Pro',    color: TIBHAR_COLOR, shape: 'circle', url: '' },
     ];
 
     // --- 2. Chart Setup ---
     const ctx = document.getElementById('rubberChart').getContext('2d');
 
-    // Legend icons
-    const butterflyLegendIcon = new Image();
-    butterflyLegendIcon.src = BUTTERFLY_ICON;
-    const tibharLegendIcon = new Image();
-    tibharLegendIcon.src = TIBHAR_ICON;
-
-    // Keep a stable reference so the legend can re-enable the dataset if needed.
     const butterflyDataset = {
         label: BUTTERFLY, // Single Category Name
         data: butterflyRubbers,
@@ -170,61 +227,7 @@
             },
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: { 
-                        usePointStyle: true, 
-                        boxWidth: 18,
-                        // Make only "Butterfly" bold; keep all other chart text non-bold.
-                        font: (context) => {
-                            const item = context?.chart?.legend?.legendItems?.[context.index];
-                            const text = (item?.text ?? '').replace(/\u00A0/g, '').trim();
-                            return { size: 12, weight: text === BUTTERFLY ? 'bold' : 'normal' };
-                        },
-                        // Force the legend icon to look generic (e.g., a circle) 
-                        // or pick a specific color since the dataset has multiple colors.
-                        generateLabels: function(chart) {
-                            const datasets = chart.data.datasets ?? [];
-                            return datasets.map((ds, datasetIndex) => {
-                                const label = ds.label ?? '';
-                                const isVisible = chart.isDatasetVisible(datasetIndex);
-
-                                const brandColor =
-                                    label === BUTTERFLY ? BUTTERFLY_COLOR :
-                                    label === TIBHAR ? TIBHAR_COLOR :
-                                    '#000';
-
-                                const icon =
-                                    label === BUTTERFLY ? butterflyLegendIcon :
-                                    label === TIBHAR ? tibharLegendIcon :
-                                    null;
-
-                                const pointStyle =
-                                    (icon && icon.complete && icon.naturalWidth > 0)
-                                        ? icon
-                                        : 'circle';
-
-                                const legendColor = isVisible ? brandColor : '#9e9e9e';
-
-                                return {
-                                    // Add a little visual gap between the icon and the label text
-                                    text: `\u00A0\u00A0${label}`,
-                                    fillStyle: legendColor,
-                                    strokeStyle: legendColor,
-                                    fontColor: legendColor,
-                                    pointStyle,
-                                    hidden: false,
-                                    datasetIndex
-                                };
-                            });
-                        }
-                    },
-                    // Clicking the legend item toggles the dataset on/off.
-                    onClick: function(_e, legendItem, legend) {
-                        const chart = legend.chart;
-                        const idx = legendItem.datasetIndex;
-                        chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
-                        chart.update();
-                    },
+                    display: false
                 },
                 tooltip: {
                     enabled: true,
@@ -269,15 +272,42 @@
         plugins: [ChartDataLabels]
     });
 
-    // Once the icon loads, redraw so the legend swaps from fallback circle to the icon.
-    butterflyLegendIcon.addEventListener('load', () => chart.update());
-    butterflyLegendIcon.addEventListener('error', () => {
-        console.warn('Failed to load legend icon:', butterflyLegendIcon.src);
+    function setActiveBrand(brand) {
+        // Ensure exactly one brand is visible.
+        chart.setDatasetVisibility(0, brand === BUTTERFLY);
+        chart.setDatasetVisibility(1, brand === TIBHAR);
+
+        // Apply brand-specific axis ranges.
+        const r = BRAND_AXIS_RANGES[brand];
+        if (r) {
+            chart.options.scales.x.min = r.xMin;
+            chart.options.scales.x.max = r.xMax;
+            chart.options.scales.y.min = r.yMin;
+            chart.options.scales.y.max = r.yMax;
+        }
+
+        chart.update();
+
+        // Update tab UI.
+        const tabs = document.querySelectorAll('.tab[data-brand]');
+        tabs.forEach((btn) => {
+            const isActive = btn.getAttribute('data-brand') === brand;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+    }
+
+    // Default to Butterfly.
+    setActiveBrand(BUTTERFLY);
+
+    // Tab click handlers.
+    document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const brand = btn.getAttribute('data-brand');
+            if (brand === BUTTERFLY || brand === TIBHAR) setActiveBrand(brand);
+        });
     });
-    tibharLegendIcon.addEventListener('load', () => chart.update());
-    tibharLegendIcon.addEventListener('error', () => {
-        console.warn('Failed to load legend icon:', tibharLegendIcon.src);
-    });
+
 </script>
 
 </body>
