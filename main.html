@@ -42,8 +42,13 @@
     const BUTTERFLY = 'Butterfly';
     const BUTTERFLY_COLOR = '#e84191';
     const BUTTERFLY_ICON = 'images/butterfly.ico';
-    const PRODUCT_DETAIL_URL_BASE = 'https://www.butterfly-global.com/en/products/detail/';
+
+    const TIBHAR = 'Tibhar';
+    const TIBHAR_COLOR = '#d32f2f';
+    const TIBHAR_ICON = 'images/tibhar.png';
     
+    // Each rubber can optionally include a `url` for manual product links:
+    // { x, y, label, color, shape, url: 'https://...' }
     const butterflyRubbers = [
         // Orange Squares (Tenergy)
         { x: 75, y: 84, label: 'Tenergy 19',      color: BUTTERFLY_COLOR, shape: 'rect' },
@@ -60,19 +65,44 @@
         { x: 79, y: 90, label: 'Dignics 64',      color: BUTTERFLY_COLOR, shape: 'rect' },
         { x: 82, y: 88, label: 'Dignics 80',      color: BUTTERFLY_COLOR, shape: 'rect' },
         { x: 85, y: 86, label: 'Dignics 05',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 96, y: 79, label: 'Dignics 09C',     color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 96, y: 79, label: 'Dignics 09C',     color: BUTTERFLY_COLOR, shape: 'circle' },
         { x: 73, y: 81, label: 'Glayzer',         color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 87, y: 75, label: 'Glayzer 09C',     color: BUTTERFLY_COLOR, shape: 'rect' },
-       
-        { x: 100, y: 88, label: 'Zyre 03',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 87, y: 75, label: 'Glayzer 09C',     color: BUTTERFLY_COLOR, shape: 'circle' },
+        { x: 100, y: 88, label: 'Zyre 03',        color: BUTTERFLY_COLOR, shape: 'rect' },
+    ];
+
+    // Add Tibhar rubbers here (same format as Butterfly).
+    // Example:
+    const tibharRubbers = [
+        // NOTE: input format provided as "Speed (y) then Spin (x)"
+        { x: 90, y: 93, label: 'EL-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 92, y: 91, label: 'EL-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 90, y: 87, label: 'EL-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 88, y: 87, label: 'FX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 91, y: 86, label: 'FX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 92, y: 87, label: 'FX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 91, y: 93, label: 'MX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 93, y: 95, label: 'MX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 94, y: 93, label: 'MX-P 50',   color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 95, y: 92, label: 'MX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 92, y: 87, label: 'K3',        color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 94, y: 89, label: 'K3 FX',     color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 93, y: 96, label: 'K3 Pro',    color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 91, y: 89, label: 'MK',        color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 91, y: 86, label: 'MK FX',     color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 95, y: 93, label: 'MK Pro',    color: TIBHAR_COLOR, shape: 'circle', url: '' },
+        { x: 92, y: 90, label: 'MX-K',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 95, y: 91, label: 'MX-K H',    color: TIBHAR_COLOR, shape: 'rect',   url: '' },
     ];
 
     // --- 2. Chart Setup ---
     const ctx = document.getElementById('rubberChart').getContext('2d');
 
-    // Legend icon
+    // Legend icons
     const butterflyLegendIcon = new Image();
     butterflyLegendIcon.src = BUTTERFLY_ICON;
+    const tibharLegendIcon = new Image();
+    tibharLegendIcon.src = TIBHAR_ICON;
 
     // Keep a stable reference so the legend can re-enable the dataset if needed.
     const butterflyDataset = {
@@ -85,11 +115,21 @@
         pointHoverRadius: 9
     };
 
+    const tibharDataset = {
+        label: TIBHAR,
+        data: tibharRubbers,
+        pointBackgroundColor: tibharRubbers.map(d => d.color ?? TIBHAR_COLOR),
+        pointStyle: tibharRubbers.map(d => d.shape ?? 'circle'),
+        pointRadius: 7,
+        pointHoverRadius: 9
+    };
+
     const chart = new Chart(ctx, {
         type: 'scatter',
         data: {
             datasets: [
-                butterflyDataset
+                butterflyDataset,
+                tibharDataset
             ]
         },
         options: {
@@ -101,7 +141,7 @@
             scales: {
                 x: {
                     min: 40,
-                    max: 110,
+                    max: 100,
                     title: {
                         display: true,
                         text: 'Spin',
@@ -114,7 +154,7 @@
                     }
                 },
                 y: {
-                    min: 60,
+                    min: 40,
                     max: 100,
                     title: {
                         display: true,
@@ -135,42 +175,53 @@
                         usePointStyle: true, 
                         boxWidth: 18,
                         // Make only "Butterfly" bold; keep all other chart text non-bold.
-                        font: { size: 12, weight: 'bold' },
+                        font: (context) => {
+                            const item = context?.chart?.legend?.legendItems?.[context.index];
+                            const text = (item?.text ?? '').replace(/\u00A0/g, '').trim();
+                            return { size: 12, weight: text === BUTTERFLY ? 'bold' : 'normal' };
+                        },
                         // Force the legend icon to look generic (e.g., a circle) 
                         // or pick a specific color since the dataset has multiple colors.
                         generateLabels: function(chart) {
-                            const idx = chart.data.datasets.findIndex(d => d.label === BUTTERFLY);
-                            const isHidden = idx === -1 ? true : !chart.isDatasetVisible(idx);
-                            const legendColor = isHidden ? '#9e9e9e' : BUTTERFLY_COLOR;
-                            const pointStyle =
-                                (butterflyLegendIcon.complete && butterflyLegendIcon.naturalWidth > 0)
-                                    ? butterflyLegendIcon
-                                    : 'circle';
+                            const datasets = chart.data.datasets ?? [];
+                            return datasets.map((ds, datasetIndex) => {
+                                const label = ds.label ?? '';
+                                const isVisible = chart.isDatasetVisible(datasetIndex);
 
-                            return [{
-                                // Add a little visual gap between the icon and the label text
-                                text: `\u00A0\u00A0${BUTTERFLY}`,
-                                fillStyle: legendColor, // Using Orange as representative color
-                                strokeStyle: legendColor,
-                                fontColor: legendColor, // gray when hidden, no strike-through
-                                pointStyle,
-                                hidden: false,
-                                datasetIndex: idx === -1 ? 0 : idx
-                            }];
+                                const brandColor =
+                                    label === BUTTERFLY ? BUTTERFLY_COLOR :
+                                    label === TIBHAR ? TIBHAR_COLOR :
+                                    '#000';
+
+                                const icon =
+                                    label === BUTTERFLY ? butterflyLegendIcon :
+                                    label === TIBHAR ? tibharLegendIcon :
+                                    null;
+
+                                const pointStyle =
+                                    (icon && icon.complete && icon.naturalWidth > 0)
+                                        ? icon
+                                        : 'circle';
+
+                                const legendColor = isVisible ? brandColor : '#9e9e9e';
+
+                                return {
+                                    // Add a little visual gap between the icon and the label text
+                                    text: `\u00A0\u00A0${label}`,
+                                    fillStyle: legendColor,
+                                    strokeStyle: legendColor,
+                                    fontColor: legendColor,
+                                    pointStyle,
+                                    hidden: false,
+                                    datasetIndex
+                                };
+                            });
                         }
                     },
                     // Clicking the legend item toggles the dataset on/off.
                     onClick: function(_e, legendItem, legend) {
                         const chart = legend.chart;
-                        let idx = chart.data.datasets.findIndex(d => d.label === BUTTERFLY);
-
-                        // If the dataset was previously removed for any reason, re-add it.
-                        if (idx === -1) {
-                            chart.data.datasets.push(butterflyDataset);
-                            chart.update();
-                            return;
-                        }
-
+                        const idx = legendItem.datasetIndex;
                         chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
                         chart.update();
                     },
@@ -205,11 +256,13 @@
                     const datasetIndex = activeElements[0].datasetIndex;
                     const dataIndex = activeElements[0].index;
                     const pointData = chart.data.datasets[datasetIndex].data[dataIndex];
-                    
-                    const rubberName = pointData.label.toLowerCase().replace(/ /g, '-');
-                    const url = `${PRODUCT_DETAIL_URL_BASE}${rubberName}.html`;
-                    
-                    window.open(url, '_blank');
+
+                    // Prefer per-rubber manual link if provided.
+                    const manualUrl = typeof pointData.url === 'string' ? pointData.url.trim() : '';
+                    if (manualUrl) {
+                        window.open(manualUrl, '_blank');
+                        return;
+                    }
                 }
             }
         },
@@ -220,6 +273,10 @@
     butterflyLegendIcon.addEventListener('load', () => chart.update());
     butterflyLegendIcon.addEventListener('error', () => {
         console.warn('Failed to load legend icon:', butterflyLegendIcon.src);
+    });
+    tibharLegendIcon.addEventListener('load', () => chart.update());
+    tibharLegendIcon.addEventListener('error', () => {
+        console.warn('Failed to load legend icon:', tibharLegendIcon.src);
     });
 </script>
 
