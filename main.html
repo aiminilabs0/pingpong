@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pingpong Rubber Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .chart-container {
+            position: relative;
+            height: 80vh;
+            width: 80vw;
+            background-color: #e5e5e5;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <canvas id="rubberChart"></canvas>
+</div>
+
+<script>
+    // --- 1. Consolidated Data ---
+    // We store color and shape directly with the data point to keep the visual distinction
+    // while using only one dataset.
+
+    // Brand-specific knobs (easy to replace later)
+    const BUTTERFLY = 'Butterfly';
+    const BUTTERFLY_COLOR = '#e84191';
+    const BUTTERFLY_ICON = 'images/butterfly.ico';
+    const PRODUCT_DETAIL_URL_BASE = 'https://www.butterfly-global.com/en/products/detail/';
+    
+    const butterflyRubbers = [
+        // Orange Squares (Tenergy)
+        { x: 75, y: 84, label: 'Tenergy 19',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 70, y: 87, label: 'Tenergy 64',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 58, y: 85, label: 'Tenergy 64 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 73, y: 85, label: 'Tenergy 80',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 61, y: 83, label: 'Tenergy 80 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 76, y: 83, label: 'Tenergy 05',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 64, y: 81, label: 'Tenergy 05 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 96, y: 82, label: 'Tenergy 05 Hard', color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 76, y: 64, label: 'Tenergy 25',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 64, y: 62, label: 'Tenergy 25 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 70, y: 83, label: 'Rozena',          color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 79, y: 90, label: 'Dignics 64',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 82, y: 88, label: 'Dignics 80',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 85, y: 86, label: 'Dignics 05',      color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 96, y: 79, label: 'Dignics 09C',     color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 73, y: 81, label: 'Glayzer',         color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 87, y: 75, label: 'Glayzer 09C',     color: BUTTERFLY_COLOR, shape: 'rect' },
+       
+        { x: 100, y: 88, label: 'Zyre 03',      color: BUTTERFLY_COLOR, shape: 'rect' },
+    ];
+
+    // --- 2. Chart Setup ---
+    const ctx = document.getElementById('rubberChart').getContext('2d');
+
+    // Legend icon
+    const butterflyLegendIcon = new Image();
+    butterflyLegendIcon.src = BUTTERFLY_ICON;
+
+    // Keep a stable reference so the legend can re-enable the dataset if needed.
+    const butterflyDataset = {
+        label: BUTTERFLY, // Single Category Name
+        data: butterflyRubbers,
+        // Map the styles from the data array
+        pointBackgroundColor: butterflyRubbers.map(d => d.color),
+        pointStyle: butterflyRubbers.map(d => d.shape),
+        pointRadius: 7,
+        pointHoverRadius: 9
+    };
+
+    const chart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                butterflyDataset
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: { top: 20, right: 50, bottom: 20, left: 20 }
+            },
+            scales: {
+                x: {
+                    min: 40,
+                    max: 110,
+                    title: {
+                        display: true,
+                        text: 'Spin',
+                        font: { size: 16, weight: 'normal' },
+                        color: '#000'
+                    },
+                    grid: {
+                        color: 'white',
+                        lineWidth: 2
+                    }
+                },
+                y: {
+                    min: 60,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Speed',
+                        font: { size: 16, weight: 'normal' },
+                        color: '#000'
+                    },
+                    grid: {
+                        color: 'white',
+                        lineWidth: 2
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { 
+                        usePointStyle: true, 
+                        boxWidth: 18,
+                        // Make only "Butterfly" bold; keep all other chart text non-bold.
+                        font: { size: 12, weight: 'bold' },
+                        // Force the legend icon to look generic (e.g., a circle) 
+                        // or pick a specific color since the dataset has multiple colors.
+                        generateLabels: function(chart) {
+                            const idx = chart.data.datasets.findIndex(d => d.label === BUTTERFLY);
+                            const isHidden = idx === -1 ? true : !chart.isDatasetVisible(idx);
+                            const legendColor = isHidden ? '#9e9e9e' : BUTTERFLY_COLOR;
+                            const pointStyle =
+                                (butterflyLegendIcon.complete && butterflyLegendIcon.naturalWidth > 0)
+                                    ? butterflyLegendIcon
+                                    : 'circle';
+
+                            return [{
+                                // Add a little visual gap between the icon and the label text
+                                text: `\u00A0\u00A0${BUTTERFLY}`,
+                                fillStyle: legendColor, // Using Orange as representative color
+                                strokeStyle: legendColor,
+                                fontColor: legendColor, // gray when hidden, no strike-through
+                                pointStyle,
+                                hidden: false,
+                                datasetIndex: idx === -1 ? 0 : idx
+                            }];
+                        }
+                    },
+                    // Clicking the legend item toggles the dataset on/off.
+                    onClick: function(_e, legendItem, legend) {
+                        const chart = legend.chart;
+                        let idx = chart.data.datasets.findIndex(d => d.label === BUTTERFLY);
+
+                        // If the dataset was previously removed for any reason, re-add it.
+                        if (idx === -1) {
+                            chart.data.datasets.push(butterflyDataset);
+                            chart.update();
+                            return;
+                        }
+
+                        chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
+                        chart.update();
+                    },
+                },
+                tooltip: {
+                    enabled: true,
+                    titleFont: { weight: 'normal' },
+                    bodyFont: { weight: 'normal' },
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.raw.label} (Spin: ${context.raw.x}, Speed: ${context.raw.y})`;
+                        }
+                    }
+                },
+                datalabels: {
+                    align: function(context) {
+                        const val = context.dataset.data[context.dataIndex];
+                        return val.x > 80 ? 'left' : 'right';
+                    },
+                    anchor: 'center',
+                    offset: 10,
+                    color: '#000',
+                    font: { size: 11, weight: 'normal' },
+                    formatter: function(value) {
+                        return value.label;
+                    }
+                }
+            },
+            // --- 3. Click Event Handler ---
+            onClick: (evt, activeElements, chart) => {
+                if (activeElements.length > 0) {
+                    const datasetIndex = activeElements[0].datasetIndex;
+                    const dataIndex = activeElements[0].index;
+                    const pointData = chart.data.datasets[datasetIndex].data[dataIndex];
+                    
+                    const rubberName = pointData.label.toLowerCase().replace(/ /g, '-');
+                    const url = `${PRODUCT_DETAIL_URL_BASE}${rubberName}.html`;
+                    
+                    window.open(url, '_blank');
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+    // Once the icon loads, redraw so the legend swaps from fallback circle to the icon.
+    butterflyLegendIcon.addEventListener('load', () => chart.update());
+    butterflyLegendIcon.addEventListener('error', () => {
+        console.warn('Failed to load legend icon:', butterflyLegendIcon.src);
+    });
+</script>
+
+</body>
+</html> 
