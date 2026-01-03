@@ -544,6 +544,53 @@
         return brand;
     }
 
+    // Rubber name localization (used by point labels + tooltip title)
+    const RUBBER_NAME_KO = {
+        'Dignics 05': '디그닉스 05',
+        'Dignics 09C': '디그닉스 09C',
+        'Dignics 64': '디그닉스 64',
+        'Dignics 80': '디그닉스 80',
+        'Glayzer': '글레이저',
+        'Glayzer 09C': '글레이저 09C',
+        'Rozena': '로제나',
+        'Tenergy 05': '테너지 05',
+        'Tenergy 05 Hard': '테너지 05하드',
+        'Tenergy 05 FX': '테너지 05FX',
+        'Tenergy 19': '테너지 19',
+        'Tenergy 25': '테너지 25',
+        'Tenergy 25 FX': '테너지 25FX',
+        'Tenergy 64': '테너지 64',
+        'Tenergy 64 FX': '테너지 64FX',
+        'Tenergy 80': '테너지 80',
+        'Tenergy 80 FX': '테너지 80FX',
+        'Zyre 03': '자이어 03',
+
+        // Tibhar (Evolution / Hybrid)
+        'EL-D': 'EL-D',
+        'EL-P': 'EL-P',
+        'EL-S': 'EL-S',
+        'FX-D': 'FX-D',
+        'FX-P': 'FX-P',
+        'FX-S': 'FX-S',
+        'MX-D': 'MX-D',
+        'MX-P': 'MX-P',
+        'MX-P 50': 'MX-P 50',
+        'MX-S': 'MX-S',
+        'K3': 'K3',
+        'K3 FX': 'K3 FX',
+        'K3 Pro': 'K3 Pro',
+        'MK': 'MK',
+        'MK FX': 'MK FX',
+        'MK Pro': 'MK Pro',
+    };
+
+    function localizeRubberName(name) {
+        const s = typeof name === 'string' ? name : '';
+        if (!s) return '';
+        if (currentLang !== 'ko') return s;
+        return RUBBER_NAME_KO[s] ?? s;
+    }
+
     function applyLanguageToDom() {
         document.documentElement.lang = currentLang;
         document.title = t('pageTitle');
@@ -865,7 +912,7 @@
         // NOTE: input format provided as "Speed (y) then Spin (x)"
         {
             x: 120,
-            y: 124,
+            y: 125,
             label: 'EL-D',
             shape: 'rect',
             url: '',
@@ -1144,7 +1191,7 @@
                     textAlign: 'left',
                     clamp: true,
                     formatter: function(value) {
-                        return value.label;
+                        return localizeRubberName(value.label);
                     }
                 }
             },
@@ -1251,7 +1298,7 @@
 
         const title = document.createElement('div');
         title.className = 't';
-        title.textContent = `${brand}${r.label ?? ''}`;
+        title.textContent = `${brand}${localizeRubberName(r.label ?? '')}`;
         tooltipEl.appendChild(title);
 
         const rows = [];
