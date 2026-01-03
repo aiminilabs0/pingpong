@@ -420,6 +420,10 @@
             <img src="images/tibhar.png" alt="" aria-hidden="true" />
             <span data-i18n="brandTibhar">Tibhar</span>
         </button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-brand="XIOM">
+            <img src="images/xiom.png" alt="" aria-hidden="true" />
+            <span data-i18n="brandXiom">XIOM</span>
+        </button>
     </div>
     <div class="canvas-wrap">
         <canvas id="rubberChart"></canvas>
@@ -477,6 +481,7 @@
             ariaBrandTabs: 'Brand',
             brandButterfly: 'Butterfly',
             brandTibhar: 'Tibhar',
+            brandXiom: 'XIOM',
             legendHardness: 'Hardness',
             legendPimplesIn: 'Pimples-in',
             legendHybrid: 'Hybrid',
@@ -500,6 +505,7 @@
             ariaBrandTabs: '브랜드',
             brandButterfly: '버터플라이',
             brandTibhar: '티바',
+            brandXiom: '엑시옴',
             legendHardness: '경도',
             legendPimplesIn: '평면러버',
             legendHybrid: '하이브리드',
@@ -542,6 +548,7 @@
     function localizeBrandName(brand) {
         if (brand === 'Butterfly') return t('brandButterfly');
         if (brand === 'Tibhar') return t('brandTibhar');
+        if (brand === 'XIOM') return t('brandXiom');
         return brand;
     }
 
@@ -583,6 +590,25 @@
         'MK': 'MK',
         'MK FX': 'MK FX',
         'MK Pro': 'MK Pro',
+
+        // XIOM
+        'C52.5': 'C52.5',
+        'C55': 'C55',
+        'C57.5': 'C57.5',
+        'V47.5': 'V47.5',
+        'Z52.5': 'Z52.5',
+        'X47.5': 'X47.5',
+        'H52.5': 'H52.5',
+
+        'Sigma 5': '시그마 5',
+        'Tau 3': '타우 3',
+        'Omega 7Pro': '오메가7 프로',
+        'China Guang': '차이나광',
+
+        // Vega series
+        'Vega Pro': '베가 프로',
+        'Vega Asia': '베가 아시아',
+        'Vega Europe': '베가 유럽',
     };
 
     function localizeRubberName(name) {
@@ -635,12 +661,16 @@
     const TIBHAR = 'Tibhar';
     const TIBHAR_ICON = 'images/tibhar.png';
 
+    const XIOM = 'XIOM';
+    const XIOM_ICON = 'images/xiom.png';
+
     // Axis ranges per brand (used by the tabs).
     // Tune these numbers if you want a tighter/looser zoom per brand.
     const BRAND_AXIS_RANGES = {
         // Butterfly includes everything from classic control rubbers to modern high-tension.
         [BUTTERFLY]: { xMin: 55,  xMax: 105, yMin: 60,  yMax: 95 },
         [TIBHAR]:    { xMin: 110, xMax: 135, yMin: 110, yMax: 135 },
+        [XIOM]:      { xMin: 30,  xMax: 90, yMin: 40,  yMax: 80 },
     };
 
     // Normal Rubber (Orange) - shade by hardness (higher hardness => darker)
@@ -661,8 +691,9 @@
     // Company-specific hardness ranges (tweak these as you add more brands).
     // If a brand is missing here, we fall back to min/max computed from the brand's dataset.
     const BRAND_HARDNESS_RANGES = {
-        [BUTTERFLY]: { min: 32, max: 44 },  // Butterfly typically shows ~32..44 in this chart
-        [TIBHAR]:    { min: 40, max: 55 },  // Tibhar typically shows ~40..55 in this chart
+        [BUTTERFLY]: { min: 32, max: 44 },
+        [TIBHAR]:    { min: 40, max: 55 },
+        [XIOM]:      { min: 40, max: 55 },
     };
 
     function parseHardness(h) {
@@ -1090,6 +1121,29 @@
         },
     ];
 
+    // XIOM rubbers (Spin=x, Speed=y)
+    const xiomRubbers = [
+        { x: 80,  y: 60,  label: 'C52.5',  shape: 'circle', hardness: '52.5', wegiht: '52g'},    
+        { x: 80,  y: 60,  label: 'C55',  shape: 'circle', hardness: '55', wegiht: '54g'},
+        { x: 75,  y: 70,  label: 'C57.5',  shape: 'circle', hardness: '57.5', wegiht: '56g'},
+
+        { x: 54,  y: 70,  label: 'V47.5',  shape: 'rect', hardness: '47.5', wegiht: '52g'},
+        { x: 60,  y: 50,  label: 'Z52.5',  shape: 'rect', hardness: '52.5', wegiht: '54g'},
+        { x: 67,  y: 60,  label: 'X47.5',  shape: 'rect', hardness: '47.5', wegiht: '51g'},
+        { x: 70,  y: 51,  label: 'H52.5',  shape: 'rect', hardness: '52.5', wegiht: '52g'},
+
+        { x: 54,  y: 60,  label: 'Sigma 5',  shape: 'rect', hardness: '47.5', weight: '46.9g' },
+
+        { x: 50,  y: 60,  label: 'Vega Pro',  shape: 'rect', hardness: '47.5', wegiht: '50g'},
+        { x: 50,  y: 50,  label: 'Vega Asia',  shape: 'rect', hardness: '47.5', wegiht: '50g'},
+        { x: 34,  y: 60,  label: 'Vega Europe',  shape: 'rect', hardness: '42.5', wegiht: '50g'},
+
+        { x: 87,  y: 41,  label: 'Tau 3',  shape: 'circle', hardness: '57.5', wegiht: '48g'},
+        { x: 64,  y: 61,  label: 'Omega 7Pro',  shape: 'rect', hardness: '47.5', wegiht: '50g'},
+        { x: 67,  y: 50,  label: 'China Guang',  shape: 'circle', hardness: '55', wegiht: '50g'},
+
+    ];
+
     // --- 2. Chart Setup ---
     const ctx = document.getElementById('rubberChart').getContext('2d');
 
@@ -1135,12 +1189,23 @@
         pointHoverRadius: 9
     };
 
+    const xiomDataset = {
+        label: XIOM,
+        data: xiomRubbers,
+        pointBackgroundColor: xiomRubbers.map(d => colorForRubberPoint(d, XIOM, xiomRubbers)),
+        pointBorderColor: xiomRubbers.map(d => colorForRubberPoint(d, XIOM, xiomRubbers)),
+        pointStyle: xiomRubbers.map(d => d.shape ?? 'circle'),
+        pointRadius: 7,
+        pointHoverRadius: 9
+    };
+
     const chart = new Chart(ctx, {
         type: 'scatter',
         data: {
             datasets: [
                 butterflyDataset,
-                tibharDataset
+                tibharDataset,
+                xiomDataset
             ]
         },
         options: {
@@ -1313,14 +1378,11 @@
         // Populate content from the hovered point.
         const dp = tooltip?.dataPoints?.[0];
         const r = dp?.raw ?? {};
-        const brandRaw = dp?.dataset?.label || '';
-        const brand = brandRaw ? `${localizeBrandName(brandRaw)}: ` : '';
-
         clearEl(tooltipEl);
 
         const title = document.createElement('div');
         title.className = 't';
-        title.textContent = `${brand}${localizeRubberName(r.label ?? '')}`;
+        title.textContent = `${localizeRubberName(r.label ?? '')}`;
         tooltipEl.appendChild(title);
 
         const rows = [];
@@ -1371,6 +1433,7 @@
         // Ensure exactly one brand is visible.
         chart.setDatasetVisibility(0, brand === BUTTERFLY);
         chart.setDatasetVisibility(1, brand === TIBHAR);
+        chart.setDatasetVisibility(2, brand === XIOM);
 
         // Apply brand-specific axis ranges.
         const r = BRAND_AXIS_RANGES[brand];
@@ -1411,7 +1474,7 @@
     document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const brand = btn.getAttribute('data-brand');
-            if (brand === BUTTERFLY || brand === TIBHAR) setActiveBrand(brand);
+            if (brand && BRAND_AXIS_RANGES[brand]) setActiveBrand(brand);
         });
     });
 
