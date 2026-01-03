@@ -4,400 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pingpong Rubber Chart</title>
+    <link rel="stylesheet" href="main.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <style>
-        :root {
-            color-scheme: dark;
-            --bg0: #060914;
-            --bg1: #0b1022;
-            --panel: rgba(255, 255, 255, 0.06);
-            --panel-2: rgba(255, 255, 255, 0.08);
-            --border: rgba(255, 255, 255, 0.14);
-            --text: rgba(255, 255, 255, 0.92);
-            --muted: rgba(255, 255, 255, 0.70);
-            --shadow: rgba(0, 0, 0, 0.55);
-            --focus: rgba(95, 207, 255, 0.55);
-            --link: #7cd3ff;
-        }
-
-        body {
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
-                "Segoe UI Emoji";
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: var(--text);
-            background:
-                radial-gradient(900px 500px at 18% 18%, rgba(233, 65, 145, 0.16), transparent 60%),
-                radial-gradient(900px 500px at 82% 24%, rgba(211, 47, 47, 0.14), transparent 60%),
-                radial-gradient(900px 500px at 55% 85%, rgba(124, 211, 255, 0.10), transparent 60%),
-                linear-gradient(180deg, var(--bg0), var(--bg1));
-        }
-        .chart-container {
-            position: relative;
-            height: 80vh;
-            width: 80vw;
-            background:
-                linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow:
-                0 24px 70px var(--shadow),
-                inset 0 1px 0 rgba(255,255,255,0.08);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow: hidden;
-        }
-        .tabs {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .tab {
-            appearance: none;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text);
-            border-radius: 999px;
-            padding: 8px 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            user-select: none;
-            transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
-        }
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.10);
-            border-color: rgba(255, 255, 255, 0.22);
-        }
-        .tab:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--focus);
-        }
-        .tab.active {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.26);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        }
-        .tab img {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
-        }
-        .lang-switch {
-            position: fixed;
-            top: 14px;
-            right: 14px;
-            z-index: 20;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(10, 14, 28, 0.55);
-            box-shadow: 0 14px 35px rgba(0,0,0,0.45);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .lang-switch label {
-            font-size: 12px;
-            font-weight: 700;
-            color: rgba(255,255,255,0.80);
-        }
-        .lang-switch select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.92);
-            border-radius: 999px;
-            padding: 6px 34px 6px 12px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-        .lang-switch select:hover {
-            background: rgba(255, 255, 255, 0.10);
-            border-color: rgba(255, 255, 255, 0.22);
-        }
-        .lang-switch select:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--focus);
-        }
-        .lang-switch .select-wrap {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-        }
-        .lang-switch .select-wrap::after {
-            content: '▾';
-            position: absolute;
-            right: 12px;
-            pointer-events: none;
-            color: rgba(255,255,255,0.70);
-            font-size: 12px;
-            transform: translateY(-0.5px);
-        }
-        .lang-switch option {
-            color: #111; /* native select dropdown text color (platform-dependent) */
-        }
-        .canvas-wrap {
-            position: relative;
-            flex: 1;
-            /* Important for flexbox: allow the chart area to shrink instead of overflowing
-               (otherwise the bottom axis can get clipped when the container has overflow:hidden). */
-            min-height: 0;
-        }
-        #rubberChart {
-            display: block;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 14px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-        }
-        .shape-legend {
-            position: absolute;
-            right: 12px;
-            bottom: 12px;
-            --shapeLegendPadX: 12px;
-            background: rgba(10, 14, 28, 0.72);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 10px;
-            padding: 10px var(--shapeLegendPadX);
-            font-size: 12px;
-            line-height: 1.25;
-            color: var(--text);
-            box-shadow: 0 14px 35px rgba(0,0,0,0.45);
-            pointer-events: none; /* don't block chart hover/click */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .shape-legend .row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-        .shape-legend .row + .row {
-            margin-top: 6px;
-        }
-        .shape-legend .marker {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            flex: 0 0 12px;
-        }
-        .shape-legend .marker.rect {
-            background: #FF9100;
-            border-radius: 2px;
-        }
-        .shape-legend .marker.circle {
-            background: #FF9100;
-            border-radius: 999px;
-        }
-        .hardness-legend {
-            position: absolute;
-            left: 12px;
-            /* Keep it compact so it doesn't cover the chart area. */
-            right: auto;
-            width: fit-content; /* shrink-wrap contents */
-            max-width: min(280px, calc(100% - 260px));
-            bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 4px;
-            padding: 6px 8px;
-            background: rgba(10, 14, 28, 0.42);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-            box-shadow: 0 10px 24px rgba(0,0,0,0.35);
-            pointer-events: none; /* don't block chart hover/click */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            --edgeGap: 10px;
-            /* Controls the overall width of the hardness legend. */
-            --barW: clamp(96px, 16vw, 160px);
-            /* Keep the bar aligned with the example number column (which has a flag column). */
-            --countryW: 26px;
-            --countryGap: 10px;
-        }
-        .hardness-legend .title {
-            font-size: 12px;
-            line-height: 1;
-            font-weight: 700;
-            color: rgba(255,255,255,0.88);
-            letter-spacing: 0.2px;
-        }
-        .hardness-legend .content {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 4px;
-        }
-        .hardness-legend .row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            /* Offset the bar by the same space used by the example's flag column + gap. */
-            padding-left: calc(var(--countryW) + var(--countryGap));
-        }
-        .hardness-legend .label {
-            font-size: 12px;
-            line-height: 1;
-            color: rgba(255,255,255,0.78);
-            white-space: nowrap;
-            letter-spacing: 0.2px;
-        }
-        .hardness-legend .label.soft {
-            text-align: right;
-        }
-        .hardness-legend .label.hard {
-            text-align: left;
-        }
-        .hardness-legend .bar {
-            height: 18px;
-            /* Narrower bar width (horizontal) while staying responsive. */
-            flex: 0 0 var(--barW);
-            border-radius: 999px;
-            background: linear-gradient(
-                90deg,
-                #FFE0B2 0%,
-                #FFCC80 25%,
-                #FFB74D 50%,
-                #FF9100 75%,
-                #EF6C00 100%
-            );
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.3px;
-            color: rgba(255,255,255,0.92);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.45);
-        }
-        .hardness-legend .example {
-            font-size: 11px;
-            line-height: 1.15;
-            color: rgba(255,255,255,0.72);
-            font-variant-numeric: tabular-nums;
-            /* Align examples under the bar (not under the edge labels). */
-            padding-left: 0;
-            padding-right: 0;
-        }
-        .hardness-legend .example .ex-line {
-            display: flex;
-            align-items: center;
-            gap: var(--countryGap);
-            justify-content: flex-start;
-        }
-        .hardness-legend .example .ex-line + .ex-line {
-            margin-top: 4px;
-        }
-        .hardness-legend .example .country {
-            width: var(--countryW);
-            color: rgba(255,255,255,0.82);
-            white-space: nowrap;
-        }
-        .hardness-legend .example .country.flag {
-            font-size: 16px;
-            line-height: 1;
-            font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui;
-            transform: translateY(1px);
-        }
-        .hardness-legend .example .nums {
-            position: relative;
-            flex: 0 0 var(--barW);
-            width: var(--barW);
-            height: 12px;
-        }
-        .hardness-legend .example .n {
-            position: absolute;
-            top: 0;
-            white-space: nowrap;
-        }
-        .hardness-legend .example .n.left {
-            left: 0;
-            transform: translateX(0);
-        }
-        .hardness-legend .example .n.mid {
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .hardness-legend .example .n.right {
-            left: 100%;
-            transform: translateX(-100%);
-        }
-        .chart-tooltip {
-            position: absolute;
-            z-index: 5;
-            max-width: 320px;
-            background: rgba(10, 14, 28, 0.90);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 10px;
-            padding: 10px 12px;
-            color: var(--text);
-            font-size: 12px;
-            line-height: 1.3;
-            box-shadow: 0 18px 45px rgba(0,0,0,0.55);
-            pointer-events: auto; /* allow clicking links */
-            display: none;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        .chart-tooltip .t {
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-        .chart-tooltip .row + .row {
-            margin-top: 4px;
-        }
-        .chart-tooltip .links {
-            margin-top: 8px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .chart-tooltip a {
-            color: var(--link);
-            text-decoration: none;
-        }
-        .chart-tooltip a:hover {
-            text-decoration: underline;
-        }
-        .chart-tooltip .icon-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-        }
-        .chart-tooltip .icon-link img {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
-        }
-    </style>
 </head>
 <body>
 
@@ -513,7 +122,7 @@
             axisSpeed: '스피드',
             tooltipSpinSpeed: '회전: {spin}, 스피드: {speed}',
             tooltipType: '타입',
-            tooltipArc: '아크',
+            tooltipArc: '궤도',
             tooltipThickness: '두께',
             tooltipSheetColors: '시트 색상',
             tooltipStrategy: '스타일',
@@ -741,19 +350,6 @@
         return typeof u === 'string' ? u.trim() : '';
     }
     
-    // Each rubber can optionally include more info (fill what you know):
-    // {
-    //   x, y, label, shape,
-    //   thickness: '1.9 / 2.1',
-    //   strategy: 'OFF / OFF+',
-    //   control: 85,
-    //   weight: '45g',
-    //   hardness: '47.5',
-    //   player: 'Zhang Jike',
-    //   youtubeUrl: 'https://www.youtube.com/watch?v=...',
-    //   productUrl: 'https://...',
-    //   // Back-compat: `url` is treated as productUrl
-    // }
     const butterflyRubbers = [
         // Orange Squares (Tenergy)
         {
@@ -938,8 +534,6 @@
         },
     ];
 
-    // Add Tibhar rubbers here (same format as Butterfly).
-    // Example:
     const tibharRubbers = [
         // NOTE: input format provided as "Speed (y) then Spin (x)"
         {
@@ -1121,7 +715,6 @@
         },
     ];
 
-    // XIOM rubbers (Spin=x, Speed=y)
     const xiomRubbers = [
         { x: 80,  y: 60,  label: 'C52.5',  shape: 'circle', hardness: '52.5', wegiht: '52g'},    
         { x: 80,  y: 60,  label: 'C55',  shape: 'circle', hardness: '55', wegiht: '54g'},
@@ -1141,7 +734,6 @@
         { x: 87,  y: 41,  label: 'Tau 3',  shape: 'circle', hardness: '57.5', wegiht: '48g'},
         { x: 64,  y: 61,  label: 'Omega 7Pro',  shape: 'rect', hardness: '47.5', wegiht: '50g'},
         { x: 67,  y: 50,  label: 'China Guang',  shape: 'circle', hardness: '55', wegiht: '50g'},
-
     ];
 
     // --- 2. Chart Setup ---
