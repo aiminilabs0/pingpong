@@ -95,6 +95,66 @@
             height: 18px;
             object-fit: contain;
         }
+        .lang-switch {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 20;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(10, 14, 28, 0.55);
+            box-shadow: 0 14px 35px rgba(0,0,0,0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .lang-switch label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.80);
+        }
+        .lang-switch select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.92);
+            border-radius: 999px;
+            padding: 6px 34px 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .lang-switch select:hover {
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+        .lang-switch select:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--focus);
+        }
+        .lang-switch .select-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .lang-switch .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 12px;
+            pointer-events: none;
+            color: rgba(255,255,255,0.70);
+            font-size: 12px;
+            transform: translateY(-0.5px);
+        }
+        .lang-switch option {
+            color: #111; /* native select dropdown text color (platform-dependent) */
+        }
         .canvas-wrap {
             position: relative;
             flex: 1;
@@ -340,15 +400,24 @@
 </head>
 <body>
 
+<div class="lang-switch" aria-label="Language">
+    <span class="select-wrap">
+        <select id="langSelect" aria-label="Language">
+            <option value="ko">🇰🇷 Korea</option>
+            <option value="en">🇺🇸 USA</option>
+        </select>
+    </span>
+</div>
+
 <div class="chart-container">
-    <div class="tabs" role="tablist" aria-label="Brand">
+    <div class="tabs" role="tablist" aria-label="Brand" id="brandTabs">
         <button class="tab active" type="button" role="tab" aria-selected="true" data-brand="Butterfly">
             <img src="images/butterfly.ico" alt="" aria-hidden="true" />
-            Butterfly
+            <span data-i18n="brandButterfly">Butterfly</span>
         </button>
         <button class="tab" type="button" role="tab" aria-selected="false" data-brand="Tibhar">
             <img src="images/tibhar.png" alt="" aria-hidden="true" />
-            Tibhar
+            <span data-i18n="brandTibhar">Tibhar</span>
         </button>
     </div>
     <div class="canvas-wrap">
@@ -356,7 +425,7 @@
         <div class="hardness-legend" aria-hidden="true">
             <div class="content">
                 <div class="row">
-                    <span class="bar">Hardness</span>
+                    <span class="bar" data-i18n="legendHardness">Hardness</span>
                 </div>
                 <div class="example">
                     <div class="ex-line">
@@ -389,17 +458,124 @@
         <div class="shape-legend" aria-hidden="true">
             <div class="row">
                 <span class="marker rect"></span>
-                <span>Pimples-in</span>
+                <span data-i18n="legendPimplesIn">Pimples-in</span>
             </div>
             <div class="row">
                 <span class="marker circle"></span>
-                <span>Hybrid</span>
+                <span data-i18n="legendHybrid">Hybrid</span>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // --- i18n (EN/KR) ---
+    const I18N = {
+        en: {
+            pageTitle: 'Pingpong Rubber Chart',
+            ariaBrandTabs: 'Brand',
+            brandButterfly: 'Butterfly',
+            brandTibhar: 'Tibhar',
+            legendHardness: 'Hardness',
+            legendPimplesIn: 'Pimples-in',
+            legendHybrid: 'Hybrid',
+            axisSpin: 'Spin',
+            axisSpeed: 'Speed',
+            tooltipSpinSpeed: 'Spin: {spin}, Speed: {speed}',
+            tooltipType: 'Type',
+            tooltipArc: 'Arc',
+            tooltipThickness: 'Thickness',
+            tooltipSheetColors: 'Sheet colors',
+            tooltipStrategy: 'Strategy',
+            tooltipControl: 'Control',
+            tooltipWeight: 'Weight',
+            tooltipHardness: 'Hardness',
+            tooltipPlayer: 'Player',
+            iconSale: 'Sale',
+            iconYouTube: 'YouTube'
+        },
+        ko: {
+            pageTitle: '탁구 러버 차트',
+            ariaBrandTabs: '브랜드',
+            brandButterfly: '버터플라이',
+            brandTibhar: '티바',
+            legendHardness: '경도',
+            legendPimplesIn: '평면러버',
+            legendHybrid: '하이브리드',
+            axisSpin: '회전',
+            axisSpeed: '스피드',
+            tooltipSpinSpeed: '회전: {spin}, 스피드: {speed}',
+            tooltipType: '타입',
+            tooltipArc: '아크',
+            tooltipThickness: '두께',
+            tooltipSheetColors: '시트 색상',
+            tooltipStrategy: '스타일',
+            tooltipControl: '컨트롤',
+            tooltipWeight: '무게',
+            tooltipHardness: '경도',
+            tooltipPlayer: '선수',
+            iconSale: '구매',
+            iconYouTube: '유튜브'
+        }
+    };
+
+    function detectDefaultLang() {
+        const nav = (navigator.language || '').toLowerCase();
+        return nav.startsWith('ko') ? 'ko' : 'en';
+    }
+
+    let currentLang = window.localStorage.getItem('lang') || detectDefaultLang();
+    if (!I18N[currentLang]) currentLang = 'en';
+
+    function t(key, vars) {
+        const table = I18N[currentLang] || I18N.en;
+        let s = table[key] ?? I18N.en[key] ?? key;
+        if (vars && typeof s === 'string') {
+            for (const [k, v] of Object.entries(vars)) {
+                s = s.replaceAll(`{${k}}`, String(v));
+            }
+        }
+        return s;
+    }
+
+    function localizeBrandName(brand) {
+        if (brand === 'Butterfly') return t('brandButterfly');
+        if (brand === 'Tibhar') return t('brandTibhar');
+        return brand;
+    }
+
+    function applyLanguageToDom() {
+        document.documentElement.lang = currentLang;
+        document.title = t('pageTitle');
+
+        const brandTabs = document.getElementById('brandTabs');
+        if (brandTabs) brandTabs.setAttribute('aria-label', t('ariaBrandTabs'));
+
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+            const key = el.getAttribute('data-i18n');
+            if (!key) return;
+            el.textContent = t(key);
+        });
+        const select = document.getElementById('langSelect');
+        if (select && select.value !== currentLang) select.value = currentLang;
+    }
+
+    function applyLanguageToChart(chart) {
+        if (!chart?.options?.scales) return;
+        if (chart.options.scales.x?.title) chart.options.scales.x.title.text = t('axisSpin');
+        if (chart.options.scales.y?.title) chart.options.scales.y.title.text = t('axisSpeed');
+        chart.update();
+    }
+
+    function setLang(lang, chart, tooltipEl) {
+        if (!I18N[lang]) return;
+        currentLang = lang;
+        window.localStorage.setItem('lang', currentLang);
+        applyLanguageToDom();
+        applyLanguageToChart(chart);
+        if (tooltipEl) tooltipEl.style.display = 'none';
+    }
+
     // --- 1. Consolidated Data ---
     // We store color and shape directly with the data point to keep the visual distinction
     // while using only one dataset.
@@ -917,7 +1093,7 @@
                     },
                     title: {
                         display: true,
-                        text: 'Spin',
+                        text: t('axisSpin'),
                         font: { size: 16, weight: 'normal' },
                         color: 'rgba(255,255,255,0.88)',
                         padding: { top: 10 }
@@ -938,7 +1114,7 @@
                     },
                     title: {
                         display: true,
-                        text: 'Speed',
+                        text: t('axisSpeed'),
                         font: { size: 16, weight: 'normal' },
                         color: 'rgba(255,255,255,0.88)'
                     },
@@ -1068,7 +1244,8 @@
         // Populate content from the hovered point.
         const dp = tooltip?.dataPoints?.[0];
         const r = dp?.raw ?? {};
-        const brand = dp?.dataset?.label ? `${dp.dataset.label}: ` : '';
+        const brandRaw = dp?.dataset?.label || '';
+        const brand = brandRaw ? `${localizeBrandName(brandRaw)}: ` : '';
 
         clearEl(tooltipEl);
 
@@ -1078,16 +1255,16 @@
         tooltipEl.appendChild(title);
 
         const rows = [];
-        rows.push(`Spin: ${r.x}, Speed: ${r.y}`);
-        if (r.type) rows.push(`Type: ${r.type}`);
-        if (typeof r.arc === 'number') rows.push(`Arc: ${r.arc}`);
-        if (r.thickness) rows.push(`Thickness: ${r.thickness}`);
-        if (Array.isArray(r.sheetColors) && r.sheetColors.length > 0) rows.push(`Sheet colors: ${r.sheetColors.join(' / ')}`);
-        if (r.strategy) rows.push(`Strategy: ${r.strategy}`);
-        if (typeof r.control === 'number') rows.push(`Control: ${r.control}`);
-        if (r.weight) rows.push(`Weight: ${r.weight}`);
-        if (r.hardness) rows.push(`Hardness: ${r.hardness}`);
-        if (r.player) rows.push(`Player: ${r.player}`);
+        rows.push(t('tooltipSpinSpeed', { spin: r.x, speed: r.y }));
+        if (r.type) rows.push(`${t('tooltipType')}: ${r.type}`);
+        if (typeof r.arc === 'number') rows.push(`${t('tooltipArc')}: ${r.arc}`);
+        if (r.thickness) rows.push(`${t('tooltipThickness')}: ${r.thickness}`);
+        if (Array.isArray(r.sheetColors) && r.sheetColors.length > 0) rows.push(`${t('tooltipSheetColors')}: ${r.sheetColors.join(' / ')}`);
+        if (r.strategy) rows.push(`${t('tooltipStrategy')}: ${r.strategy}`);
+        if (typeof r.control === 'number') rows.push(`${t('tooltipControl')}: ${r.control}`);
+        if (r.weight) rows.push(`${t('tooltipWeight')}: ${r.weight}`);
+        if (r.hardness) rows.push(`${t('tooltipHardness')}: ${r.hardness}`);
+        if (r.player) rows.push(`${t('tooltipPlayer')}: ${r.player}`);
 
         rows.forEach((txt) => {
             const row = document.createElement('div');
@@ -1100,8 +1277,8 @@
         links.className = 'links';
         const product = normalizeUrl(r.productUrl) || normalizeUrl(r.url);
         const youtube = normalizeUrl(r.youtubeUrl);
-        const aShop = makeIconLink('images/sale.png', 'Sale', product);
-        const aYt = makeIconLink('images/youtube.ico', 'YouTube', youtube);
+        const aShop = makeIconLink('images/sale.png', t('iconSale'), product);
+        const aYt = makeIconLink('images/youtube.ico', t('iconYouTube'), youtube);
         if (aShop) links.appendChild(aShop);
         if (aYt) links.appendChild(aYt);
         if (links.childNodes.length > 0) tooltipEl.appendChild(links);
@@ -1148,6 +1325,18 @@
 
     // Default to Butterfly.
     setActiveBrand(BUTTERFLY);
+
+    // Language switch init + handlers.
+    applyLanguageToDom();
+    applyLanguageToChart(chart);
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        langSelect.addEventListener('change', () => {
+            const lang = langSelect.value;
+            if (!lang) return;
+            setLang(lang, chart, tooltipEl);
+        });
+    }
 
     // Tab click handlers.
     document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
