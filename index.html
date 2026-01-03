@@ -616,6 +616,7 @@
         tooltipPinned = false;
         if (hideTooltipTimer) window.clearTimeout(hideTooltipTimer);
         hideTooltipTimer = window.setTimeout(() => {
+            tooltipEl.classList.remove('show');
             tooltipEl.style.display = 'none';
         }, 50);
     });
@@ -817,7 +818,10 @@
             // Give the user a small window to move from the point to the tooltip to click links.
             if (hideTooltipTimer) window.clearTimeout(hideTooltipTimer);
             hideTooltipTimer = window.setTimeout(() => {
-                if (!tooltipPinned) tooltipEl.style.display = 'none';
+                if (!tooltipPinned) {
+                    tooltipEl.classList.remove('show');
+                    tooltipEl.style.display = 'none';
+                }
             }, 350);
             return;
         }
@@ -832,10 +836,40 @@
         const r = dp?.raw ?? {};
         clearEl(tooltipEl);
 
+        const head = document.createElement('div');
+        head.className = 'head';
+
         const title = document.createElement('div');
         title.className = 't';
         title.textContent = `${localizeRubberName(r.label ?? '')}`;
-        tooltipEl.appendChild(title);
+
+        // Header actions: product / YouTube icons next to the rubber name.
+        const product = productUrlForPoint(r);
+        const youtube = youtubeUrlForPoint(r);
+        const aShop = makeIconLink('images/sale.png', t('iconSale'), product);
+        const aYt = makeIconLink('images/youtube.ico', t('iconYouTube'), youtube);
+        if (aShop || aYt) {
+            const actions = document.createElement('div');
+            actions.className = 'actions';
+
+            // Clicking icons should also update the URL to include rubber.
+            if (aShop) aShop.addEventListener('click', () => {
+                setRubberParamInUrl(r?.label);
+            });
+            if (aYt) aYt.addEventListener('click', (e) => {
+                setRubberParamInUrl(r?.label);
+                // Prefer in-page embed for YouTube when possible.
+                maybeEmbedYouTubeClick(e, youtube);
+            });
+
+            if (aShop) actions.appendChild(aShop);
+            if (aYt) actions.appendChild(aYt);
+            head.appendChild(actions);
+        }
+
+        // Place actions *before* the name (user preference).
+        head.appendChild(title);
+        tooltipEl.appendChild(head);
 
         const rows = [];
         if (r.type) rows.push(`${t('tooltipType')}: ${r.type}`);
@@ -855,27 +889,6 @@
             tooltipEl.appendChild(row);
         });
 
-        const links = document.createElement('div');
-        links.className = 'links';
-        const product = productUrlForPoint(r);
-        const youtube = youtubeUrlForPoint(r);
-        const aShop = makeIconLink('images/sale.png', t('iconSale'), product);
-        const aYt = makeIconLink('images/youtube.ico', t('iconYouTube'), youtube);
-        // Clicking a rubber's icons should also update the URL to include rubber.
-        if (aShop) aShop.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setRubberParamInUrl(r?.label);
-        });
-        if (aYt) aYt.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setRubberParamInUrl(r?.label);
-        });
-        if (aShop) links.appendChild(aShop);
-        if (aYt) links.appendChild(aYt);
-        if (links.childNodes.length > 0) tooltipEl.appendChild(links);
-
         // Position near the cursor (within canvas-wrap, which is positioned).
         const wrapRect = canvasWrapEl.getBoundingClientRect();
         const desired = forcedTooltipPos;
@@ -889,6 +902,10 @@
         tooltipEl.style.left = `${left}px`;
         tooltipEl.style.top = `${top}px`;
         tooltipEl.style.display = 'block';
+        // Restart the "pop" animation even if the tooltip is already open.
+        tooltipEl.classList.remove('show');
+        void tooltipEl.offsetWidth; // force reflow
+        tooltipEl.classList.add('show');
     }
 
     function setActiveBrand(brand) {
