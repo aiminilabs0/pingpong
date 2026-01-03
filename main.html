@@ -591,7 +591,7 @@
     // Tune these numbers if you want a tighter/looser zoom per brand.
     const BRAND_AXIS_RANGES = {
         // Butterfly includes everything from classic control rubbers to modern high-tension.
-        [BUTTERFLY]: { xMin: 50,   xMax: 105, yMin: 55,   yMax: 95 },
+        [BUTTERFLY]: { xMin: 55,  xMax: 105, yMin: 60,  yMax: 95 },
         [TIBHAR]:    { xMin: 110, xMax: 135, yMin: 110, yMax: 135 },
     };
 
@@ -1079,7 +1079,7 @@
             maintainAspectRatio: false,
             layout: {
                 // Extra bottom padding prevents the x-axis title from getting clipped.
-                padding: { top: 20, right: 50, bottom: 56, left: 20 }
+                padding: { top: 20, right: 110, bottom: 56, left: 20 }
             },
             scales: {
                 x: {
@@ -1135,14 +1135,14 @@
                     }
                 },
                 datalabels: {
-                    align: function(context) {
-                        const val = context.dataset.data[context.dataIndex];
-                        return val.x > 80 ? 'left' : 'right';
-                    },
+                    // Always place the label immediately to the right of the point (dot).
+                    align: 'right',
                     anchor: 'center',
-                    offset: 10,
+                    offset: 8,
                     color: 'rgba(255,255,255,0.88)',
                     font: { size: 11, weight: 'normal' },
+                    textAlign: 'left',
+                    clamp: true,
                     formatter: function(value) {
                         return value.label;
                     }
