@@ -1175,7 +1175,8 @@
 
         const title = document.createElement('div');
         title.className = 'yt-modal-title';
-        title.textContent = 'YouTube';
+        // Intentionally blank: user requested no visible "YouTube" text in the overlay header.
+        title.textContent = '';
 
         const closeBtn = document.createElement('button');
         closeBtn.className = 'yt-close';
@@ -1184,7 +1185,8 @@
 
         const openLink = document.createElement('a');
         openLink.className = 'yt-open';
-        openLink.textContent = 'Open on YouTube';
+        // Keep the external link functionality but avoid showing "YouTube" text.
+        openLink.textContent = 'Open in new tab';
         openLink.target = '_blank';
         openLink.rel = 'noopener noreferrer';
         openLink.href = '#';
@@ -1228,7 +1230,7 @@
         const embedUrl = toYouTubeEmbedUrl(originalUrl);
         if (!embedUrl) return false;
         const overlay = ensureYouTubeOverlay();
-        overlay._yt.title.textContent = 'YouTube';
+        overlay._yt.title.textContent = '';
         overlay._yt.openLink.href = originalUrl;
         overlay._yt.iframe.src = embedUrl;
         overlay.classList.add('open');
