@@ -47,11 +47,15 @@ function toYouTubeEmbedUrl(u) {
         }
         if (!id) return null;
         const start = parseStartSeconds(u);
-        const embed = new URL(`https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}`);
+        // NOTE: We intentionally use the standard YouTube embed domain (not youtube-nocookie)
+        // because the privacy-enhanced domain can show an in-player "Copy link" UI overlay.
+        const embed = new URL(`https://www.youtube.com/embed/${encodeURIComponent(id)}`);
         embed.searchParams.set('autoplay', '1');
         embed.searchParams.set('rel', '0');
         embed.searchParams.set('modestbranding', '1');
         embed.searchParams.set('playsinline', '1');
+        embed.searchParams.set('fs', '0');  // Disable fullscreen button
+        embed.searchParams.set('disablekb', '1');  // Disable keyboard controls
         if (start > 0) embed.searchParams.set('start', String(start));
         if (typeof location !== 'undefined' && location.origin && location.origin !== 'null') {
             embed.searchParams.set('origin', location.origin);
@@ -76,39 +80,23 @@ function ensureYouTubeOverlay() {
     const modal = document.createElement('div');
     modal.className = 'yt-modal';
 
-    const head = document.createElement('div');
-    head.className = 'yt-modal-head';
-
-    const title = document.createElement('div');
-    title.className = 'yt-modal-title';
-    title.textContent = '';
-
     const closeBtn = document.createElement('button');
     closeBtn.className = 'yt-close';
     closeBtn.type = 'button';
-    closeBtn.textContent = 'Close';
-
-    const openLink = document.createElement('a');
-    openLink.className = 'yt-open';
-    openLink.textContent = 'Open on YouTube';
-    openLink.target = '_blank';
-    openLink.rel = 'noopener noreferrer';
-    openLink.href = '#';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.setAttribute('aria-label', 'Close');
 
     const frameWrap = document.createElement('div');
     frameWrap.className = 'yt-frame';
     const iframe = document.createElement('iframe');
-    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+    iframe.setAttribute('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture');
     iframe.setAttribute('allowfullscreen', '');
     iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     iframe.setAttribute('title', 'YouTube video player');
     frameWrap.appendChild(iframe);
 
-    head.appendChild(title);
-    head.appendChild(openLink);
-    head.appendChild(closeBtn);
-    modal.appendChild(head);
     modal.appendChild(frameWrap);
+    modal.appendChild(closeBtn);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
@@ -125,7 +113,7 @@ function ensureYouTubeOverlay() {
         if (e.key === 'Escape' && overlay.classList.contains('open')) closeOverlay();
     });
 
-    overlay._yt = { iframe, title, closeOverlay, openLink };
+    overlay._yt = { iframe, closeOverlay };
     return overlay;
 }
 
@@ -133,8 +121,6 @@ function openYouTubeEmbed(originalUrl) {
     const embedUrl = toYouTubeEmbedUrl(originalUrl);
     if (!embedUrl) return false;
     const overlay = ensureYouTubeOverlay();
-    overlay._yt.title.textContent = '';
-    overlay._yt.openLink.href = originalUrl;
     overlay._yt.iframe.src = embedUrl;
     overlay.classList.add('open');
     return true;
@@ -149,5 +135,5 @@ function maybeEmbedYouTubeClick(e, url) {
     return openYouTubeEmbed(url);
 }
 
-export { isYouTubeUrl, maybeEmbedYouTubeClick };
+export { isYouTubeUrl, maybeEmbedYouTubeClick, openYouTubeEmbed };
 

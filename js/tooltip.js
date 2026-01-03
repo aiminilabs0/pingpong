@@ -126,27 +126,26 @@ class TooltipManager {
         const aShop = makeIconLink('images/sale.png', this.i18nManager.t('iconSale'), product);
         const aYt = makeIconLink('images/youtube.ico', this.i18nManager.t('iconYouTube'), youtube);
 
-        if (aShop || aYt) {
-            const actions = document.createElement('div');
-            actions.className = 'actions';
+        const actions = document.createElement('div');
+        actions.className = 'actions';
 
-            if (aShop) {
-                aShop.addEventListener('click', () => {
-                    this.urlManager.setRubberParam(r?.label);
-                });
-                actions.appendChild(aShop);
-            }
-
-            if (aYt) {
-                aYt.addEventListener('click', (e) => {
-                    this.urlManager.setRubberParam(r?.label);
-                    maybeEmbedYouTubeClick(e, youtube);
-                });
-                actions.appendChild(aYt);
-            }
-
-            head.appendChild(actions);
+        if (aShop) {
+            aShop.addEventListener('click', () => {
+                this.urlManager.setRubberParam(r?.label);
+            });
+            actions.appendChild(aShop);
         }
+
+        if (aYt) {
+            aYt.addEventListener('click', (e) => {
+                this.urlManager.setRubberParam(r?.label);
+                this.urlManager.setYouTubeParam(youtube);
+                maybeEmbedYouTubeClick(e, youtube);
+            });
+            actions.appendChild(aYt);
+        }
+
+        head.appendChild(actions);
 
         head.appendChild(title);
         this.tooltipEl.appendChild(head);

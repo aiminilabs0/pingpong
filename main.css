@@ -45,73 +45,54 @@ body {
     display: flex;
 }
 .yt-modal {
+    position: relative;
     width: min(1280px, calc(100vw - 20px));
     max-height: calc(100vh - 20px);
-    background: rgba(10, 14, 28, 0.88);
+    background: #000;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 14px;
     box-shadow: 0 28px 85px rgba(0,0,0,0.65);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-.yt-modal-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 12px;
-    background: rgba(255,255,255,0.06);
-    border-bottom: 1px solid rgba(255,255,255,0.10);
-}
-.yt-modal-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.80);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 .yt-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
     appearance: none;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255,255,255,0.92);
-    border-radius: 10px;
-    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.70);
+    color: rgba(255,255,255,0.95);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.50);
+    transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 .yt-close:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.85);
+    border-color: rgba(255, 255, 255, 0.40);
+    transform: scale(1.05);
 }
 .yt-close:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--focus);
 }
-.yt-open {
-    color: rgba(255,255,255,0.86);
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 6px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.06);
-}
-.yt-open:hover {
-    background: rgba(255, 255, 255, 0.10);
-    border-color: rgba(255, 255, 255, 0.20);
-}
-.yt-open:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px var(--focus);
-}
 .yt-frame {
+    position: relative;
     width: 100%;
     /* Bigger, near-fullscreen player; avoids tiny embeds on large monitors. */
-    height: min(82vh, calc(100vh - 86px));
+    height: min(82vh, calc(100vh - 20px));
     background: #000;
 }
 .yt-frame iframe {
@@ -119,6 +100,18 @@ body {
     height: 100%;
     border: 0;
     display: block;
+}
+/* Block YouTube's top-right in-player overlay controls area (e.g. share/copy UI) */
+.yt-frame::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 140px;
+    height: 70px;
+    background: transparent;
+    pointer-events: auto;
+    z-index: 1;
 }
 .chart-container {
     position: relative;
@@ -588,6 +581,12 @@ body {
     }
     .chart-tooltip .icon-link {
         transition: none;
+    }
+    .yt-close {
+        transition: none;
+    }
+    .yt-close:hover {
+        transform: none;
     }
 }
 

@@ -7,6 +7,7 @@ import { UrlManager } from './url-manager.js';
 import { TooltipManager } from './tooltip.js';
 import { ChartManager } from './chart-manager.js';
 import { BUTTERFLY, BRAND_AXIS_RANGES } from './constants.js';
+import { openYouTubeEmbed, isYouTubeUrl } from './youtube-embed.js';
 
 // Initialize managers
 const i18nManager = new I18nManager();
@@ -78,5 +79,14 @@ document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
 if (urlRubber) {
     const match = chartManager.findRubberByLabel(urlRubber);
     if (match) chartManager.openRubberInfo(match, { preferLabelPosition: true });
+}
+
+// Handle initial YouTube video from URL
+const urlYouTube = (urlParams.get('youtube') || '').trim();
+if (urlYouTube && isYouTubeUrl(urlYouTube)) {
+    // Small delay to ensure page is fully loaded
+    setTimeout(() => {
+        openYouTubeEmbed(urlYouTube);
+    }, 100);
 }
 

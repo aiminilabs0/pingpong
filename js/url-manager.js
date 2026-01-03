@@ -19,6 +19,7 @@ class UrlManager {
                 if (next.country) url.searchParams.set('country', String(next.country));
                 if (next.company) url.searchParams.set('company', String(next.company));
                 if (next.rubber) url.searchParams.set('rubber', String(next.rubber));
+                if (next.youtube) url.searchParams.set('youtube', String(next.youtube));
             }
             window.history.replaceState({}, '', url.toString());
         } catch {
@@ -30,6 +31,12 @@ class UrlManager {
         const s = (typeof label === 'string' ? label : '').trim();
         if (!s) return;
         this.setParams({ rubber: s });
+    }
+
+    setYouTubeParam(youtubeUrl) {
+        const s = (typeof youtubeUrl === 'string' ? youtubeUrl : '').trim();
+        if (!s) return;
+        this.setParams({ youtube: s });
     }
 
     deleteParam(key) {
