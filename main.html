@@ -143,11 +143,11 @@
             flex: 0 0 12px;
         }
         .shape-legend .marker.rect {
-            background: #2e7d32;
+            background: #FF9100;
             border-radius: 2px;
         }
         .shape-legend .marker.circle {
-            background: #6a1b9a;
+            background: #FF9100;
             border-radius: 999px;
         }
         .chart-tooltip {
@@ -238,11 +238,9 @@
 
     // Brand-specific knobs (easy to replace later)
     const BUTTERFLY = 'Butterfly';
-    const BUTTERFLY_COLOR = '#e84191';
     const BUTTERFLY_ICON = 'images/butterfly.ico';
 
     const TIBHAR = 'Tibhar';
-    const TIBHAR_COLOR = '#d32f2f';
     const TIBHAR_ICON = 'images/tibhar.png';
 
     // Axis ranges per brand (used by the tabs).
@@ -254,8 +252,8 @@
     };
 
     // Shape legend colors (regardless of brand)
-    const NORMAL_RUBBER_COLOR = '#2e7d32';   // green
-    const PIMPLES_IN_COLOR = '#6a1b9a';      // purple
+    const NORMAL_RUBBER_COLOR = '#FF9100';   // Orange
+    const PIMPLES_IN_COLOR = '#FF9100';      // Blue
     function colorForShape(shape) {
         return shape === 'circle' ? PIMPLES_IN_COLOR : NORMAL_RUBBER_COLOR;
     }
@@ -282,7 +280,6 @@
             x: 85,
             y: 86,
             label: 'Dignics 05',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 88,
@@ -293,7 +290,6 @@
             x: 96,
             y: 79,
             label: 'Dignics 09C',
-            color: BUTTERFLY_COLOR,
             shape: 'circle',
             url: '',
             arc: 96,
@@ -304,7 +300,6 @@
             x: 79,
             y: 90,
             label: 'Dignics 64',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 84,
@@ -315,7 +310,6 @@
             x: 82,
             y: 88,
             label: 'Dignics 80',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 86,
@@ -326,7 +320,6 @@
             x: 73,
             y: 81,
             label: 'Glayzer',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 82,
@@ -337,7 +330,6 @@
             x: 87,
             y: 75,
             label: 'Glayzer 09C',
-            color: BUTTERFLY_COLOR,
             shape: 'circle',
             url: '',
             arc: 95,
@@ -348,7 +340,6 @@
             x: 70,
             y: 83,
             label: 'Rozena',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 75,
@@ -359,7 +350,6 @@
             x: 76,
             y: 83,
             label: 'Tenergy 05',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: 'https://www.coupang.com/vp/products/8414405864?itemId=24331707549&vendorItemId=92706240298&q=%ED%85%8C%EB%84%88%EC%A7%8005&searchId=d10be3d818557427&sourceType=search&itemsCount=36&searchRank=0&rank=0&traceId=mjxipwjc',
             arc: 79,
@@ -370,7 +360,6 @@
             x: 96,
             y: 82,
             label: 'Tenergy 05 Hard',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 92,
@@ -381,7 +370,6 @@
             x: 64,
             y: 81,
             label: 'Tenergy 05 FX',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 65,
@@ -392,7 +380,6 @@
             x: 75,
             y: 84,
             label: 'Tenergy 19',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 78,
@@ -403,7 +390,6 @@
             x: 76,
             y: 64,
             label: 'Tenergy 25',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 86,
@@ -414,7 +400,6 @@
             x: 64,
             y: 62,
             label: 'Tenergy 25 FX',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 72,
@@ -425,7 +410,6 @@
             x: 70,
             y: 87,
             label: 'Tenergy 64',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 75,
@@ -436,7 +420,6 @@
             x: 58,
             y: 85,
             label: 'Tenergy 64 FX',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 61,
@@ -447,7 +430,6 @@
             x: 73,
             y: 85,
             label: 'Tenergy 80',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 77,
@@ -458,7 +440,6 @@
             x: 61,
             y: 83,
             label: 'Tenergy 80 FX',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 63,
@@ -469,7 +450,6 @@
             x: 100,
             y: 88,
             label: 'Zyre 03',
-            color: BUTTERFLY_COLOR,
             shape: 'rect',
             url: '',
             arc: 96,
@@ -486,7 +466,6 @@
             x: 120,
             y: 124,
             label: 'EL-D',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.9 / 2.1',
@@ -498,7 +477,6 @@
             x: 117,
             y: 121,
             label: 'EL-P',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
@@ -510,7 +488,6 @@
             x: 120,
             y: 123,
             label: 'EL-S',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.5 / 1,7 / 1,9 / 2,1',
@@ -522,7 +499,6 @@
             x: 118,
             y: 120,
             label: 'FX-D',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.9 / 2.1',
@@ -534,7 +510,6 @@
             x: 115,
             y: 120,
             label: 'FX-P',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.7 / 1.9 / 2.1',
@@ -546,7 +521,6 @@
             x: 117,
             y: 118,
             label: 'FX-S',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
@@ -558,7 +532,6 @@
             x: 122,
             y: 130,
             label: 'MX-D',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             youtubeUrl: 'https://www.youtube.com/watch?v=haxt_8BOEoo',
@@ -571,7 +544,6 @@
             x: 122,
             y: 125,
             label: 'MX-P',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
@@ -583,7 +555,6 @@
             x: 120,
             y: 128,
             label: 'MX-P 50',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '2.1',
@@ -595,7 +566,6 @@
             x: 124,
             y: 125,
             label: 'MX-S',
-            color: TIBHAR_COLOR,
             shape: 'rect',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
@@ -607,7 +577,6 @@
             x: 130,
             y: 118,
             label: 'K3',
-            color: TIBHAR_COLOR,
             shape: 'circle',
             url: '',
             thickness: '2.0 / MAX',
@@ -619,7 +588,6 @@
             x: 130,
             y: 115,
             label: 'K3 FX',
-            color: TIBHAR_COLOR,
             shape: 'circle',
             url: '',
             thickness: '2.0 / MAX',
@@ -631,7 +599,6 @@
             x: 130,
             y: 125,
             label: 'K3 Pro',
-            color: TIBHAR_COLOR,
             shape: 'circle',
             url: '',
             thickness: '2.0 / MAX',
@@ -643,7 +610,6 @@
             x: 120,
             y: 124,
             label: 'MK',
-            color: TIBHAR_COLOR,
             shape: 'circle',
             url: '',
             thickness: '2.0 / MAX',
@@ -655,7 +621,6 @@
             x: 118,
             y: 118,
             label: 'MK FX',
-            color: TIBHAR_COLOR,
             shape: 'circle',
             url: '',
             thickness: '2.0 / MAX',
@@ -667,7 +632,6 @@
             x: 124,
             y: 130,
             label: 'MK Pro',
-            color: TIBHAR_COLOR,
             shape: 'circle',
             url: '',
             thickness: '2.0 / MAX',
