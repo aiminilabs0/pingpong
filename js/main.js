@@ -71,6 +71,9 @@ document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
             chartManager.setActiveBrand(brand);
             window.localStorage.setItem('company', brand);
             urlManager.setParams({ company: chartManager.getCurrentBrand() });
+            // When switching company/brand, clear any previously selected rubber + YouTube link from the URL.
+            urlManager.deleteParam('rubber');
+            urlManager.deleteParam('youtube');
         }
     });
 });

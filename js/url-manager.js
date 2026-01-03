@@ -31,6 +31,8 @@ class UrlManager {
         const s = (typeof label === 'string' ? label : '').trim();
         if (!s) return;
         this.setParams({ rubber: s });
+        // If the rubber changes, the previously selected YouTube link (if any) should be cleared.
+        this.deleteParam('youtube');
     }
 
     setYouTubeParam(youtubeUrl) {
