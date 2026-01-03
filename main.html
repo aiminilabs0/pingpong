@@ -7,23 +7,49 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
+        :root {
+            color-scheme: dark;
+            --bg0: #060914;
+            --bg1: #0b1022;
+            --panel: rgba(255, 255, 255, 0.06);
+            --panel-2: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.14);
+            --text: rgba(255, 255, 255, 0.92);
+            --muted: rgba(255, 255, 255, 0.70);
+            --shadow: rgba(0, 0, 0, 0.55);
+            --focus: rgba(95, 207, 255, 0.55);
+            --link: #7cd3ff;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+                "Segoe UI Emoji";
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            color: var(--text);
+            background:
+                radial-gradient(900px 500px at 18% 18%, rgba(233, 65, 145, 0.16), transparent 60%),
+                radial-gradient(900px 500px at 82% 24%, rgba(211, 47, 47, 0.14), transparent 60%),
+                radial-gradient(900px 500px at 55% 85%, rgba(124, 211, 255, 0.10), transparent 60%),
+                linear-gradient(180deg, var(--bg0), var(--bg1));
         }
         .chart-container {
             position: relative;
             height: 80vh;
             width: 80vw;
-            background-color: #e5e5e5;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow:
+                0 24px 70px var(--shadow),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -37,9 +63,9 @@
         }
         .tab {
             appearance: none;
-            border: 1px solid rgba(0,0,0,0.18);
-            background: rgba(255,255,255,0.55);
-            color: #111;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
             border-radius: 999px;
             padding: 8px 12px;
             display: inline-flex;
@@ -52,16 +78,17 @@
             transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
         }
         .tab:hover {
-            background: rgba(255,255,255,0.8);
-            border-color: rgba(0,0,0,0.25);
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(255, 255, 255, 0.22);
         }
         .tab:focus-visible {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.35);
+            box-shadow: 0 0 0 3px var(--focus);
         }
         .tab.active {
-            background: rgba(255,255,255,0.95);
-            border-color: rgba(0,0,0,0.35);
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.26);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
         }
         .tab img {
             width: 18px;
@@ -71,6 +98,104 @@
         .canvas-wrap {
             position: relative;
             flex: 1;
+        }
+        #rubberChart {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        .shape-legend {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            background: rgba(10, 14, 28, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            line-height: 1.25;
+            color: var(--text);
+            box-shadow: 0 14px 35px rgba(0,0,0,0.45);
+            pointer-events: none; /* don't block chart hover/click */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .shape-legend .row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .shape-legend .row + .row {
+            margin-top: 6px;
+        }
+        .shape-legend .marker {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            flex: 0 0 12px;
+        }
+        .shape-legend .marker.rect {
+            background: #2e7d32;
+            border-radius: 2px;
+        }
+        .shape-legend .marker.circle {
+            background: #6a1b9a;
+            border-radius: 999px;
+        }
+        .chart-tooltip {
+            position: absolute;
+            z-index: 5;
+            max-width: 320px;
+            background: rgba(10, 14, 28, 0.90);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1.3;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.55);
+            pointer-events: auto; /* allow clicking links */
+            display: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .chart-tooltip .t {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .chart-tooltip .row + .row {
+            margin-top: 4px;
+        }
+        .chart-tooltip .links {
+            margin-top: 8px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .chart-tooltip a {
+            color: var(--link);
+            text-decoration: none;
+        }
+        .chart-tooltip a:hover {
+            text-decoration: underline;
+        }
+        .chart-tooltip .icon-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+        }
+        .chart-tooltip .icon-link img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
         }
     </style>
 </head>
@@ -89,6 +214,16 @@
     </div>
     <div class="canvas-wrap">
         <canvas id="rubberChart"></canvas>
+        <div class="shape-legend" aria-hidden="true">
+            <div class="row">
+                <span class="marker rect"></span>
+                <span>Pimples-in</span>
+            </div>
+            <div class="row">
+                <span class="marker circle"></span>
+                <span>Hybrid</span>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -112,29 +247,47 @@
         [BUTTERFLY]: { xMin: 50,  xMax: 110, yMin: 50,  yMax: 100 },
         [TIBHAR]:    { xMin: 110, xMax: 135, yMin: 110, yMax: 135 },
     };
+
+    // Shape legend colors (regardless of brand)
+    const NORMAL_RUBBER_COLOR = '#2e7d32';   // green
+    const PIMPLES_IN_COLOR = '#6a1b9a';      // purple
+    function colorForShape(shape) {
+        return shape === 'circle' ? PIMPLES_IN_COLOR : NORMAL_RUBBER_COLOR;
+    }
+    function normalizeUrl(u) {
+        return typeof u === 'string' ? u.trim() : '';
+    }
     
-    // Each rubber can optionally include a `url` for manual product links:
-    // { x, y, label, color, shape, url: 'https://...' }
+    // Each rubber can optionally include more info (fill what you know):
+    // {
+    //   x, y, label, shape,
+    //   weight: '45g',
+    //   hardness: '47.5',
+    //   player: 'Zhang Jike',
+    //   youtubeUrl: 'https://www.youtube.com/watch?v=...',
+    //   productUrl: 'https://...',
+    //   // Back-compat: `url` is treated as productUrl
+    // }
     const butterflyRubbers = [
         // Orange Squares (Tenergy)
-        { x: 75, y: 84, label: 'Tenergy 19',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 70, y: 87, label: 'Tenergy 64',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 58, y: 85, label: 'Tenergy 64 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 73, y: 85, label: 'Tenergy 80',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 61, y: 83, label: 'Tenergy 80 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 76, y: 83, label: 'Tenergy 05',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 64, y: 81, label: 'Tenergy 05 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 96, y: 82, label: 'Tenergy 05 Hard', color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 76, y: 64, label: 'Tenergy 25',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 64, y: 62, label: 'Tenergy 25 FX',   color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 70, y: 83, label: 'Rozena',          color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 79, y: 90, label: 'Dignics 64',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 82, y: 88, label: 'Dignics 80',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 85, y: 86, label: 'Dignics 05',      color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 96, y: 79, label: 'Dignics 09C',     color: BUTTERFLY_COLOR, shape: 'circle' },
-        { x: 73, y: 81, label: 'Glayzer',         color: BUTTERFLY_COLOR, shape: 'rect' },
-        { x: 87, y: 75, label: 'Glayzer 09C',     color: BUTTERFLY_COLOR, shape: 'circle' },
-        { x: 100, y: 88, label: 'Zyre 03',        color: BUTTERFLY_COLOR, shape: 'rect' },
+        { x: 85, y: 86, label: 'Dignics 05',      color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 96, y: 79, label: 'Dignics 09C',     color: BUTTERFLY_COLOR, shape: 'circle', url: '' },
+        { x: 79, y: 90, label: 'Dignics 64',      color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 82, y: 88, label: 'Dignics 80',      color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 73, y: 81, label: 'Glayzer',         color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 87, y: 75, label: 'Glayzer 09C',     color: BUTTERFLY_COLOR, shape: 'circle', url: '' },
+        { x: 70, y: 83, label: 'Rozena',          color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 76, y: 83, label: 'Tenergy 05',      color: BUTTERFLY_COLOR, shape: 'rect', url: 'https://www.coupang.com/vp/products/8414405864?itemId=24331707549&vendorItemId=92706240298&q=%ED%85%8C%EB%84%88%EC%A7%8005&searchId=d10be3d818557427&sourceType=search&itemsCount=36&searchRank=0&rank=0&traceId=mjxipwjc' },
+        { x: 96, y: 82, label: 'Tenergy 05 Hard', color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 64, y: 81, label: 'Tenergy 05 FX',   color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 75, y: 84, label: 'Tenergy 19',      color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 76, y: 64, label: 'Tenergy 25',      color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 64, y: 62, label: 'Tenergy 25 FX',   color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 70, y: 87, label: 'Tenergy 64',      color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 58, y: 85, label: 'Tenergy 64 FX',   color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 73, y: 85, label: 'Tenergy 80',      color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 61, y: 83, label: 'Tenergy 80 FX',   color: BUTTERFLY_COLOR, shape: 'rect', url: '' },
+        { x: 100, y: 88, label: 'Zyre 03',        color: BUTTERFLY_COLOR, shape: 'rect', url: '' }
     ];
 
     // Add Tibhar rubbers here (same format as Butterfly).
@@ -147,7 +300,7 @@
         { x: 118, y: 120, label: 'FX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
         { x: 115, y: 120, label: 'FX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
         { x: 117, y: 118, label: 'FX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
-        { x: 122, y: 130, label: 'MX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
+        { x: 122, y: 130, label: 'MX-D',      color: TIBHAR_COLOR, shape: 'rect',   url: '', youtubeUrl: 'https://www.youtube.com/watch?v=haxt_8BOEoo' },
         { x: 122, y: 125, label: 'MX-P',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
         { x: 120, y: 128, label: 'MX-P 50',   color: TIBHAR_COLOR, shape: 'rect',   url: '' },
         { x: 124, y: 125, label: 'MX-S',      color: TIBHAR_COLOR, shape: 'rect',   url: '' },
@@ -166,7 +319,8 @@
         label: BUTTERFLY, // Single Category Name
         data: butterflyRubbers,
         // Map the styles from the data array
-        pointBackgroundColor: butterflyRubbers.map(d => d.color),
+        pointBackgroundColor: butterflyRubbers.map(d => colorForShape(d.shape)),
+        pointBorderColor: butterflyRubbers.map(d => colorForShape(d.shape)),
         pointStyle: butterflyRubbers.map(d => d.shape),
         pointRadius: 7,
         pointHoverRadius: 9
@@ -175,7 +329,8 @@
     const tibharDataset = {
         label: TIBHAR,
         data: tibharRubbers,
-        pointBackgroundColor: tibharRubbers.map(d => d.color ?? TIBHAR_COLOR),
+        pointBackgroundColor: tibharRubbers.map(d => colorForShape(d.shape ?? 'circle')),
+        pointBorderColor: tibharRubbers.map(d => colorForShape(d.shape ?? 'circle')),
         pointStyle: tibharRubbers.map(d => d.shape ?? 'circle'),
         pointRadius: 7,
         pointHoverRadius: 9
@@ -203,11 +358,11 @@
                         display: true,
                         text: 'Spin',
                         font: { size: 16, weight: 'normal' },
-                        color: '#000'
+                        color: 'rgba(255,255,255,0.88)'
                     },
                     grid: {
-                        color: 'white',
-                        lineWidth: 2
+                        color: 'rgba(255,255,255,0.10)',
+                        lineWidth: 1
                     }
                 },
                 y: {
@@ -217,11 +372,11 @@
                         display: true,
                         text: 'Speed',
                         font: { size: 16, weight: 'normal' },
-                        color: '#000'
+                        color: 'rgba(255,255,255,0.88)'
                     },
                     grid: {
-                        color: 'white',
-                        lineWidth: 2
+                        color: 'rgba(255,255,255,0.10)',
+                        lineWidth: 1
                     }
                 }
             },
@@ -230,13 +385,9 @@
                     display: false
                 },
                 tooltip: {
-                    enabled: true,
-                    titleFont: { weight: 'normal' },
-                    bodyFont: { weight: 'normal' },
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.raw.label} (Spin: ${context.raw.x}, Speed: ${context.raw.y})`;
-                        }
+                    enabled: false,
+                    external: function(context) {
+                        externalTooltipHandler(context);
                     }
                 },
                 datalabels: {
@@ -246,7 +397,7 @@
                     },
                     anchor: 'center',
                     offset: 10,
-                    color: '#000',
+                    color: 'rgba(255,255,255,0.88)',
                     font: { size: 11, weight: 'normal' },
                     formatter: function(value) {
                         return value.label;
@@ -258,19 +409,143 @@
                 if (activeElements.length > 0) {
                     const datasetIndex = activeElements[0].datasetIndex;
                     const dataIndex = activeElements[0].index;
-                    const pointData = chart.data.datasets[datasetIndex].data[dataIndex];
+                    const ds = chart.data.datasets[datasetIndex];
+                    const pointData = ds.data[dataIndex];
 
-                    // Prefer per-rubber manual link if provided.
-                    const manualUrl = typeof pointData.url === 'string' ? pointData.url.trim() : '';
-                    if (manualUrl) {
-                        window.open(manualUrl, '_blank');
-                        return;
-                    }
+                    // Click opens a link if present (shopping preferred, then YouTube).
+                    const product = normalizeUrl(pointData.productUrl) || normalizeUrl(pointData.url);
+                    const youtube = normalizeUrl(pointData.youtubeUrl);
+                    const toOpen = product || youtube;
+                    if (toOpen) window.open(toOpen, '_blank');
                 }
             }
         },
         plugins: [ChartDataLabels]
     });
+
+    // --- HTML tooltip (clickable links) ---
+    const canvasWrapEl = document.querySelector('.canvas-wrap');
+    const tooltipEl = document.createElement('div');
+    tooltipEl.className = 'chart-tooltip';
+    canvasWrapEl.appendChild(tooltipEl);
+
+    let tooltipPinned = false;
+    let hideTooltipTimer = null;
+    tooltipEl.addEventListener('mouseenter', () => {
+        tooltipPinned = true;
+        if (hideTooltipTimer) {
+            window.clearTimeout(hideTooltipTimer);
+            hideTooltipTimer = null;
+        }
+    });
+    tooltipEl.addEventListener('mouseleave', () => {
+        tooltipPinned = false;
+        if (hideTooltipTimer) window.clearTimeout(hideTooltipTimer);
+        hideTooltipTimer = window.setTimeout(() => {
+            tooltipEl.style.display = 'none';
+        }, 50);
+    });
+
+    function clearEl(el) {
+        while (el.firstChild) el.removeChild(el.firstChild);
+    }
+
+    function makeLink(label, url) {
+        const u = normalizeUrl(url);
+        if (!u) return null;
+        const a = document.createElement('a');
+        a.href = u;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = label;
+        return a;
+    }
+
+    function makeIconLink(iconSrc, altText, url) {
+        const u = normalizeUrl(url);
+        if (!u) return null;
+        const a = document.createElement('a');
+        a.href = u;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'icon-link';
+        a.setAttribute('aria-label', altText);
+        const img = document.createElement('img');
+        img.src = iconSrc;
+        img.alt = altText;
+        a.appendChild(img);
+        return a;
+    }
+
+    function externalTooltipHandler(context) {
+        const { chart, tooltip } = context;
+
+        // If the tooltip should be hidden, only hide if the user isn't hovering the tooltip itself.
+        if (tooltip.opacity === 0) {
+            if (tooltipPinned) return;
+
+            // Give the user a small window to move from the point to the tooltip to click links.
+            if (hideTooltipTimer) window.clearTimeout(hideTooltipTimer);
+            hideTooltipTimer = window.setTimeout(() => {
+                if (!tooltipPinned) tooltipEl.style.display = 'none';
+            }, 350);
+            return;
+        }
+
+        if (hideTooltipTimer) {
+            window.clearTimeout(hideTooltipTimer);
+            hideTooltipTimer = null;
+        }
+
+        // Populate content from the hovered point.
+        const dp = tooltip?.dataPoints?.[0];
+        const r = dp?.raw ?? {};
+        const brand = dp?.dataset?.label ? `${dp.dataset.label}: ` : '';
+
+        clearEl(tooltipEl);
+
+        const title = document.createElement('div');
+        title.className = 't';
+        title.textContent = `${brand}${r.label ?? ''}`;
+        tooltipEl.appendChild(title);
+
+        const rows = [];
+        rows.push(`Spin: ${r.x}, Speed: ${r.y}`);
+        if (r.weight) rows.push(`Weight: ${r.weight}`);
+        if (r.hardness) rows.push(`Hardness: ${r.hardness}`);
+        if (r.player) rows.push(`Player: ${r.player}`);
+
+        rows.forEach((txt) => {
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.textContent = txt;
+            tooltipEl.appendChild(row);
+        });
+
+        const links = document.createElement('div');
+        links.className = 'links';
+        const product = normalizeUrl(r.productUrl) || normalizeUrl(r.url);
+        const youtube = normalizeUrl(r.youtubeUrl);
+        const aShop = makeIconLink('images/sale.png', 'Sale', product);
+        const aYt = makeIconLink('images/youtube.ico', 'YouTube', youtube);
+        if (aShop) links.appendChild(aShop);
+        if (aYt) links.appendChild(aYt);
+        if (links.childNodes.length > 0) tooltipEl.appendChild(links);
+
+        // Position near the cursor (within canvas-wrap, which is positioned).
+        const wrapRect = canvasWrapEl.getBoundingClientRect();
+        const left = Math.min(
+            tooltip.caretX + 12,
+            wrapRect.width - 12
+        );
+        const top = Math.min(
+            tooltip.caretY + 12,
+            wrapRect.height - 12
+        );
+        tooltipEl.style.left = `${left}px`;
+        tooltipEl.style.top = `${top}px`;
+        tooltipEl.style.display = 'block';
+    }
 
     function setActiveBrand(brand) {
         // Ensure exactly one brand is visible.
