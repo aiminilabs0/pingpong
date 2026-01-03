@@ -1185,8 +1185,7 @@
 
         const openLink = document.createElement('a');
         openLink.className = 'yt-open';
-        // Keep the external link functionality but avoid showing "YouTube" text.
-        openLink.textContent = 'Open in new tab';
+        openLink.textContent = 'Open on YouTube';
         openLink.target = '_blank';
         openLink.rel = 'noopener noreferrer';
         openLink.href = '#';
@@ -1309,7 +1308,6 @@
         tooltipEl.appendChild(title);
 
         const rows = [];
-        rows.push(t('tooltipSpinSpeed', { spin: r.x, speed: r.y }));
         if (r.type) rows.push(`${t('tooltipType')}: ${r.type}`);
         if (typeof r.arc === 'number') rows.push(`${t('tooltipArc')}: ${r.arc}`);
         if (r.thickness) rows.push(`${t('tooltipThickness')}: ${r.thickness}`);
