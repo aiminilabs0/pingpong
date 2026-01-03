@@ -71,11 +71,11 @@
         </div>
         <div class="shape-legend" aria-hidden="true">
             <div class="row">
-                <span class="marker rect"></span>
+                <span class="marker circle"></span>
                 <span data-i18n="legendPimplesIn">Pimples-in</span>
             </div>
             <div class="row">
-                <span class="marker circle"></span>
+                <span class="marker rectRot"></span>
                 <span data-i18n="legendHybrid">Hybrid</span>
             </div>
         </div>
@@ -349,6 +349,15 @@
     function normalizeUrl(u) {
         return typeof u === 'string' ? u.trim() : '';
     }
+
+    // Swap shapes:
+    // - circle -> rectRot
+    // - rect   -> circle
+    function mapPointStyle(shape) {
+        if (shape === 'hybrid') return 'rectRot';
+        if (shape === 'normal') return 'circle';
+        return shape ?? 'normal';
+    }
     
     const butterflyRubbers = [
         // Orange Squares (Tenergy)
@@ -356,7 +365,7 @@
             x: 85,
             y: 86,
             label: 'Dignics 05',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 88,
             hardness: '40',
@@ -366,7 +375,7 @@
             x: 96,
             y: 79,
             label: 'Dignics 09C',
-            shape: 'circle',
+            shape: 'hybrid',
             url: '',
             arc: 96,
             hardness: '44',
@@ -376,7 +385,7 @@
             x: 79,
             y: 90,
             label: 'Dignics 64',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 84,
             hardness: '40',
@@ -386,7 +395,7 @@
             x: 82,
             y: 88,
             label: 'Dignics 80',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 86,
             hardness: '40',
@@ -396,7 +405,7 @@
             x: 73,
             y: 81,
             label: 'Glayzer',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 82,
             hardness: '38',
@@ -416,7 +425,7 @@
             x: 70,
             y: 83,
             label: 'Rozena',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 75,
             hardness: '35',
@@ -426,7 +435,7 @@
             x: 76,
             y: 83,
             label: 'Tenergy 05',
-            shape: 'rect',
+            shape: 'normal',
             url: 'https://www.coupang.com/vp/products/8414405864?itemId=24331707549&vendorItemId=92706240298&q=%ED%85%8C%EB%84%88%EC%A7%8005&searchId=d10be3d818557427&sourceType=search&itemsCount=36&searchRank=0&rank=0&traceId=mjxipwjc',
             arc: 79,
             hardness: '36',
@@ -436,7 +445,7 @@
             x: 96,
             y: 82,
             label: 'Tenergy 05 Hard',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 92,
             hardness: '43',
@@ -446,7 +455,7 @@
             x: 64,
             y: 81,
             label: 'Tenergy 05 FX',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 65,
             hardness: '32',
@@ -456,7 +465,7 @@
             x: 75,
             y: 84,
             label: 'Tenergy 19',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 78,
             hardness: '36',
@@ -466,7 +475,7 @@
             x: 76,
             y: 64,
             label: 'Tenergy 25',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 86,
             hardness: '36',
@@ -476,7 +485,7 @@
             x: 64,
             y: 62,
             label: 'Tenergy 25 FX',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 72,
             hardness: '32',
@@ -486,7 +495,7 @@
             x: 70,
             y: 87,
             label: 'Tenergy 64',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 75,
             hardness: '36',
@@ -496,7 +505,7 @@
             x: 58,
             y: 85,
             label: 'Tenergy 64 FX',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 61,
             hardness: '32',
@@ -506,7 +515,7 @@
             x: 73,
             y: 85,
             label: 'Tenergy 80',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 77,
             hardness: '36',
@@ -516,7 +525,7 @@
             x: 61,
             y: 83,
             label: 'Tenergy 80 FX',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 63,
             hardness: '32',
@@ -526,7 +535,7 @@
             x: 100,
             y: 88,
             label: 'Zyre 03',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             arc: 96,
             hardness: '44',
@@ -540,7 +549,7 @@
             x: 120,
             y: 125,
             label: 'EL-D',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.9 / 2.1',
             strategy: 'OFF- / OFF+',
@@ -551,7 +560,7 @@
             x: 117,
             y: 121,
             label: 'EL-P',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'ALL+ / OFF+',
@@ -562,7 +571,7 @@
             x: 120,
             y: 123,
             label: 'EL-S',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.5 / 1,7 / 1,9 / 2,1',
             strategy: 'OFF- / OFF+',
@@ -573,7 +582,7 @@
             x: 118,
             y: 120,
             label: 'FX-D',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.9 / 2.1',
             strategy: 'ALL+ / OFF',
@@ -584,7 +593,7 @@
             x: 115,
             y: 120,
             label: 'FX-P',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.7 / 1.9 / 2.1',
             strategy: 'ALL / OFF',
@@ -595,7 +604,7 @@
             x: 117,
             y: 118,
             label: 'FX-S',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'ALL+ / OFF',
@@ -606,7 +615,7 @@
             x: 122,
             y: 130,
             label: 'MX-D',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             youtubeUrl: 'https://www.youtube.com/watch?v=haxt_8BOEoo',
             thickness: '1,9 / 2,1',
@@ -618,7 +627,7 @@
             x: 122,
             y: 125,
             label: 'MX-P',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'OFF- / OFF+',
@@ -629,7 +638,7 @@
             x: 120,
             y: 128,
             label: 'MX-P 50',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '2.1',
             strategy: 'OFF / OFF+',
@@ -640,7 +649,7 @@
             x: 124,
             y: 125,
             label: 'MX-S',
-            shape: 'rect',
+            shape: 'normal',
             url: '',
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'ALL+ / OFF',
@@ -651,7 +660,7 @@
             x: 130,
             y: 118,
             label: 'K3',
-            shape: 'circle',
+            shape: 'hybrid',
             url: '',
             thickness: '2.0 / MAX',
             strategy: 'OFF+',
@@ -662,7 +671,7 @@
             x: 130,
             y: 115,
             label: 'K3 FX',
-            shape: 'circle',
+            shape: 'hybrid',
             url: '',
             thickness: '2.0 / MAX',
             strategy: 'OFF',
@@ -673,7 +682,7 @@
             x: 130,
             y: 125,
             label: 'K3 Pro',
-            shape: 'circle',
+            shape: 'hybrid',
             url: '',
             thickness: '2.0 / MAX',
             strategy: 'OFF+',
@@ -684,7 +693,7 @@
             x: 120,
             y: 124,
             label: 'MK',
-            shape: 'circle',
+            shape: 'hybrid',
             url: '',
             thickness: '2.0 / MAX',
             strategy: 'OFF',
@@ -695,7 +704,7 @@
             x: 118,
             y: 118,
             label: 'MK FX',
-            shape: 'circle',
+            shape: 'hybrid',
             url: '',
             thickness: '2.0 / MAX',
             strategy: 'OFF-',
@@ -706,7 +715,7 @@
             x: 124,
             y: 130,
             label: 'MK Pro',
-            shape: 'circle',
+            shape: 'hybrid',
             url: '',
             thickness: '2.0 / MAX',
             strategy: 'OFF+',
@@ -716,24 +725,24 @@
     ];
 
     const xiomRubbers = [
-        { x: 80,  y: 60,  label: 'C52.5',  shape: 'circle', hardness: '52.5', wegiht: '52g'},    
-        { x: 80,  y: 60,  label: 'C55',  shape: 'circle', hardness: '55', wegiht: '54g'},
-        { x: 75,  y: 70,  label: 'C57.5',  shape: 'circle', hardness: '57.5', wegiht: '56g'},
+        { x: 80,  y: 60,  label: 'C52.5',  shape: 'hybrid', hardness: '52.5', wegiht: '52g'},    
+        { x: 80,  y: 61,  label: 'C55',  shape: 'hybrid', hardness: '55', wegiht: '54g'},
+        { x: 75,  y: 70,  label: 'C57.5',  shape: 'hybrid', hardness: '57.5', wegiht: '56g'},
 
-        { x: 54,  y: 70,  label: 'V47.5',  shape: 'rect', hardness: '47.5', wegiht: '52g'},
-        { x: 60,  y: 50,  label: 'Z52.5',  shape: 'rect', hardness: '52.5', wegiht: '54g'},
-        { x: 67,  y: 60,  label: 'X47.5',  shape: 'rect', hardness: '47.5', wegiht: '51g'},
-        { x: 70,  y: 51,  label: 'H52.5',  shape: 'rect', hardness: '52.5', wegiht: '52g'},
+        { x: 54,  y: 70,  label: 'V47.5',  shape: 'normal', hardness: '47.5', wegiht: '52g'},
+        { x: 60,  y: 50,  label: 'Z52.5',  shape: 'normal', hardness: '52.5', wegiht: '54g'},
+        { x: 67,  y: 60,  label: 'X47.5',  shape: 'normal', hardness: '47.5', wegiht: '51g'},
+        { x: 70,  y: 51,  label: 'H52.5',  shape: 'normal', hardness: '52.5', wegiht: '52g'},
 
-        { x: 54,  y: 60,  label: 'Sigma 5',  shape: 'rect', hardness: '47.5', weight: '46.9g' },
+        { x: 54,  y: 60,  label: 'Sigma 5',  shape: 'normal', hardness: '47.5', weight: '46.9g' },
 
-        { x: 50,  y: 60,  label: 'Vega Pro',  shape: 'rect', hardness: '47.5', wegiht: '50g'},
-        { x: 50,  y: 50,  label: 'Vega Asia',  shape: 'rect', hardness: '47.5', wegiht: '50g'},
-        { x: 34,  y: 60,  label: 'Vega Europe',  shape: 'rect', hardness: '42.5', wegiht: '50g'},
+        { x: 50,  y: 60,  label: 'Vega Pro',  shape: 'normal', hardness: '47.5', wegiht: '50g'},
+        { x: 50,  y: 50,  label: 'Vega Asia',  shape: 'normal', hardness: '47.5', wegiht: '50g'},
+        { x: 34,  y: 60,  label: 'Vega Europe',  shape: 'normal', hardness: '42.5', wegiht: '50g'},
 
-        { x: 87,  y: 41,  label: 'Tau 3',  shape: 'circle', hardness: '57.5', wegiht: '48g'},
-        { x: 64,  y: 61,  label: 'Omega 7Pro',  shape: 'rect', hardness: '47.5', wegiht: '50g'},
-        { x: 67,  y: 50,  label: 'China Guang',  shape: 'circle', hardness: '55', wegiht: '50g'},
+        { x: 87,  y: 41,  label: 'Tau 3',  shape: 'hybrid', hardness: '57.5', wegiht: '48g'},
+        { x: 64,  y: 61,  label: 'Omega 7Pro',  shape: 'hybrid', hardness: '47.5', wegiht: '50g'},
+        { x: 67,  y: 50,  label: 'China Guang',  shape: 'hybrid', hardness: '55', wegiht: '50g'},
     ];
 
     // --- 2. Chart Setup ---
@@ -766,7 +775,7 @@
         // Map the styles from the data array
         pointBackgroundColor: butterflyRubbers.map(d => colorForRubberPoint(d, BUTTERFLY, butterflyRubbers)),
         pointBorderColor: butterflyRubbers.map(d => colorForRubberPoint(d, BUTTERFLY, butterflyRubbers)),
-        pointStyle: butterflyRubbers.map(d => d.shape),
+        pointStyle: butterflyRubbers.map(d => mapPointStyle(d.shape)),
         pointRadius: 7,
         pointHoverRadius: 9
     };
@@ -776,7 +785,7 @@
         data: tibharRubbers,
         pointBackgroundColor: tibharRubbers.map(d => colorForRubberPoint(d, TIBHAR, tibharRubbers)),
         pointBorderColor: tibharRubbers.map(d => colorForRubberPoint(d, TIBHAR, tibharRubbers)),
-        pointStyle: tibharRubbers.map(d => d.shape ?? 'circle'),
+        pointStyle: tibharRubbers.map(d => mapPointStyle(d.shape ?? 'normal')),
         pointRadius: 7,
         pointHoverRadius: 9
     };
@@ -786,7 +795,7 @@
         data: xiomRubbers,
         pointBackgroundColor: xiomRubbers.map(d => colorForRubberPoint(d, XIOM, xiomRubbers)),
         pointBorderColor: xiomRubbers.map(d => colorForRubberPoint(d, XIOM, xiomRubbers)),
-        pointStyle: xiomRubbers.map(d => d.shape ?? 'circle'),
+        pointStyle: xiomRubbers.map(d => mapPointStyle(d.shape ?? 'normal')),
         pointRadius: 7,
         pointHoverRadius: 9
     };

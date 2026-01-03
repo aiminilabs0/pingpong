@@ -198,6 +198,12 @@ body {
     background: #FF9100;
     border-radius: 2px;
 }
+.shape-legend .marker.rectRot {
+    background: #FF9100;
+    border-radius: 2px;
+    transform: rotate(45deg) scale(0.85);
+    transform-origin: center;
+}
 .shape-legend .marker.circle {
     background: #FF9100;
     border-radius: 999px;
