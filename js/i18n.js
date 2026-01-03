@@ -26,6 +26,10 @@ const I18N = {
         tooltipHardness: 'Hardness',
         tooltipPlayer: 'Player',
         iconSale: 'Sale',
+        iconNaver: 'Naver',
+        iconCoupang: 'Coupang',
+        iconAmazon: 'Amazon',
+        iconLink: 'Link',
         iconYouTube: 'YouTube'
     },
     ko: {
@@ -50,6 +54,10 @@ const I18N = {
         tooltipHardness: '경도',
         tooltipPlayer: '선수',
         iconSale: '구매',
+        iconNaver: '네이버',
+        iconCoupang: '쿠팡',
+        iconAmazon: '아마존',
+        iconLink: '링크',
         iconYouTube: '유튜브'
     }
 };

@@ -42,6 +42,31 @@ function makeIconLink(iconSrc, altText, url) {
     return a;
 }
 
+function shopIconMetaForUrl(productUrl, country, i18nManager) {
+    const u = normalizeUrl(productUrl);
+    if (!u) return null;
+
+    let host = '';
+    try {
+        host = new URL(u).hostname.replace(/^www\./, '').toLowerCase();
+    } catch {
+        host = '';
+    }
+
+    if (host === 'naver.com' || host.endsWith('.naver.com')) {
+        return { src: 'images/naver.ico', alt: i18nManager.t('iconNaver') };
+    }
+    if (host === 'coupang.com' || host.endsWith('.coupang.com')) {
+        return { src: 'images/coupang.ico', alt: i18nManager.t('iconCoupang') };
+    }
+    if (host.includes('amazon.')) {
+        return { src: 'images/amazon.ico', alt: i18nManager.t('iconAmazon') };
+    }
+
+    // Fallback: generic link icon.
+    return { src: 'images/link.ico', alt: i18nManager.t('iconLink') };
+}
+
 class TooltipManager {
     constructor(canvasWrapEl, i18nManager, urlManager) {
         this.i18nManager = i18nManager;
@@ -123,7 +148,8 @@ class TooltipManager {
         const country = this.i18nManager.getCountry();
         const product = productUrlForPoint(r, country);
         const youtube = youtubeUrlForPoint(r, country);
-        const aShop = makeIconLink('images/sale.png', this.i18nManager.t('iconSale'), product);
+        const shopMeta = shopIconMetaForUrl(product, country, this.i18nManager);
+        const aShop = shopMeta ? makeIconLink(shopMeta.src, shopMeta.alt, product) : null;
         const aYt = makeIconLink('images/youtube.ico', this.i18nManager.t('iconYouTube'), youtube);
 
         const actions = document.createElement('div');
