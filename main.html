@@ -175,10 +175,11 @@
             position: absolute;
             right: 12px;
             bottom: 12px;
+            --shapeLegendPadX: 12px;
             background: rgba(10, 14, 28, 0.72);
             border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 10px var(--shapeLegendPadX);
             font-size: 12px;
             line-height: 1.25;
             color: var(--text);
@@ -1092,6 +1093,27 @@
     // --- 2. Chart Setup ---
     const ctx = document.getElementById('rubberChart').getContext('2d');
 
+    // Keep the bottom-right "shape legend" aligned to the chart's *plot area* (chartArea),
+    // not the full canvas (which includes extra right padding for labels).
+    const overlayAlignPlugin = {
+        id: 'overlayAlignPlugin',
+        afterLayout(chart) {
+            const wrap = chart?.canvas?.closest?.('.canvas-wrap');
+            if (!wrap || !chart?.chartArea) return;
+
+            const shapeLegend = wrap.querySelector('.shape-legend');
+            if (!shapeLegend) return;
+
+            const cs = getComputedStyle(shapeLegend);
+            const padRight = parseFloat(cs.paddingRight) || 0;
+            const insetRight = (chart.width - chart.chartArea.right) || 0;
+
+            // We want the *text* to end at chartArea.right, which is inside the legend box by `paddingRight`.
+            const right = Math.max(0, insetRight - padRight);
+            shapeLegend.style.right = `${right}px`;
+        }
+    };
+
     const butterflyDataset = {
         label: BUTTERFLY, // Single Category Name
         data: butterflyRubbers,
@@ -1126,7 +1148,7 @@
             maintainAspectRatio: false,
             layout: {
                 // Extra bottom padding prevents the x-axis title from getting clipped.
-                padding: { top: 20, right: 110, bottom: 56, left: 20 }
+                padding: { top: 20, right: 20, bottom: 56, left: 20 }
             },
             scales: {
                 x: {
@@ -1211,7 +1233,7 @@
                 }
             }
         },
-        plugins: [ChartDataLabels]
+        plugins: [ChartDataLabels, overlayAlignPlugin]
     });
 
     // --- HTML tooltip (clickable links) ---
