@@ -10,11 +10,11 @@
 </head>
 <body>
 
-<div class="lang-switch" aria-label="Language">
+<div class="lang-switch" aria-label="Country">
     <span class="select-wrap">
-        <select id="langSelect" aria-label="Language">
-            <option value="ko">🇰🇷 Korea</option>
-            <option value="en">🇺🇸 USA</option>
+        <select id="countrySelect" aria-label="Country">
+            <option value="kr">🇰🇷 Korea</option>
+            <option value="us">🇺🇸 USA</option>
         </select>
     </span>
 </div>
@@ -135,12 +135,30 @@
         }
     };
 
-    function detectDefaultLang() {
+    const COUNTRY_TO_LANG = {
+        kr: 'ko',
+        us: 'en',
+    };
+
+    function detectDefaultCountry() {
         const nav = (navigator.language || '').toLowerCase();
-        return nav.startsWith('ko') ? 'ko' : 'en';
+        return nav.startsWith('ko') ? 'kr' : 'us';
     }
 
-    let currentLang = window.localStorage.getItem('lang') || detectDefaultLang();
+    function normalizeCountry(country) {
+        return COUNTRY_TO_LANG[country] ? country : 'us';
+    }
+
+    let currentCountry = window.localStorage.getItem('country');
+    if (!currentCountry) {
+        // Back-compat: old storage key was "lang" with values "ko" / "en".
+        const legacyLang = window.localStorage.getItem('lang');
+        if (legacyLang === 'ko') currentCountry = 'kr';
+        else if (legacyLang === 'en') currentCountry = 'us';
+    }
+    currentCountry = normalizeCountry(currentCountry || detectDefaultCountry());
+
+    let currentLang = COUNTRY_TO_LANG[currentCountry] || 'en';
     if (!I18N[currentLang]) currentLang = 'en';
 
     function t(key, vars) {
@@ -227,7 +245,7 @@
         return RUBBER_NAME_KO[s] ?? s;
     }
 
-    function applyLanguageToDom() {
+    function applyCountryToDom() {
         document.documentElement.lang = currentLang;
         document.title = t('pageTitle');
 
@@ -239,8 +257,8 @@
             if (!key) return;
             el.textContent = t(key);
         });
-        const select = document.getElementById('langSelect');
-        if (select && select.value !== currentLang) select.value = currentLang;
+        const select = document.getElementById('countrySelect');
+        if (select && select.value !== currentCountry) select.value = currentCountry;
     }
 
     function applyLanguageToChart(chart) {
@@ -250,11 +268,14 @@
         chart.update();
     }
 
-    function setLang(lang, chart, tooltipEl) {
-        if (!I18N[lang]) return;
-        currentLang = lang;
+    function setCountry(country, chart, tooltipEl) {
+        if (!COUNTRY_TO_LANG[country]) return;
+        currentCountry = country;
+        currentLang = COUNTRY_TO_LANG[currentCountry] || 'en';
+        window.localStorage.setItem('country', currentCountry);
+        // Optional: keep derived language in sync for back-compat.
         window.localStorage.setItem('lang', currentLang);
-        applyLanguageToDom();
+        applyCountryToDom();
         applyLanguageToChart(chart);
         if (tooltipEl) tooltipEl.style.display = 'none';
     }
@@ -350,6 +371,20 @@
         return typeof u === 'string' ? u.trim() : '';
     }
 
+    function valueForCountry(v) {
+        if (typeof v === 'string') return v;
+        if (v && typeof v === 'object') return v[currentCountry] ?? '';
+        return '';
+    }
+
+    function productUrlForPoint(pointData) {
+        return normalizeUrl(valueForCountry(pointData?.productUrlByCountry ?? pointData?.productUrl));
+    }
+
+    function youtubeUrlForPoint(pointData) {
+        return normalizeUrl(valueForCountry(pointData?.youtubeUrlByCountry ?? pointData?.youtubeUrl));
+    }
+
     // Swap shapes:
     // - circle -> rectRot
     // - rect   -> circle
@@ -366,8 +401,8 @@
             y: 86,
             label: 'Dignics 05',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 88,
             hardness: '40',
             thickness: '2.1 / 1.9',
@@ -377,8 +412,8 @@
             y: 79,
             label: 'Dignics 09C',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 96,
             hardness: '44',
             thickness: '2.1 / 1.9',
@@ -388,8 +423,8 @@
             y: 90,
             label: 'Dignics 64',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 84,
             hardness: '40',
             thickness: '2.1 / 1.9',
@@ -399,8 +434,8 @@
             y: 88,
             label: 'Dignics 80',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 86,
             hardness: '40',
             thickness: '2.1 / 1.9',
@@ -410,8 +445,8 @@
             y: 81,
             label: 'Glayzer',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 82,
             hardness: '38',
             thickness: '2.1 / 1.9',
@@ -421,8 +456,8 @@
             y: 75,
             label: 'Glayzer 09C',
             shape: 'circle',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 95,
             hardness: '42',
             thickness: '2.1 / 1.9',
@@ -432,8 +467,8 @@
             y: 83,
             label: 'Rozena',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 75,
             hardness: '35',
             thickness: '2.1 / 1.9 / 1.7',
@@ -443,8 +478,8 @@
             y: 83,
             label: 'Tenergy 05',
             shape: 'normal',
-            productUrl: 'https://www.coupang.com/vp/products/8414405864?itemId=24331707549&vendorItemId=92706240298&q=%ED%85%8C%EB%84%88%EC%A7%8005&searchId=d10be3d818557427&sourceType=search&itemsCount=36&searchRank=0&rank=0&traceId=mjxipwjc',
-            youtubeUrl: '',
+            productUrl: { kr: 'https://www.coupang.com/vp/products/8414405864?itemId=24331707549&vendorItemId=92706240298&q=%ED%85%8C%EB%84%88%EC%A7%8005&searchId=d10be3d818557427&sourceType=search&itemsCount=36&searchRank=0&rank=0&traceId=mjxipwjc', us: 'https://www.amazon.com/Butterfly-2-1-Tenergy-Rubber-Black/dp/B0018LMC9C/ref=sr_1_1?crid=2GT84PTP4SREU&dib=eyJ2IjoiMSJ9.LipPUoRPG3IUAnbR6WG2OEaD5RGNR3ykblpma6WFfQw0hclqD7zKsjJ0JuO3DeoxwWwphOm-MsrbFUQY0H3pts85663obxnhp93ukq-0ZkUW2J8qD0Q1bI6DF5P7BiKwkAVe-tmcfn2SnEWo5toUfBgcAePef22I1M0zB9lPGbDeo8S-2_zfDkQnBnzdCzb-Vjxi8tgB1-1oj9RPGfUgKVviDV5L8N7IzcAUPfCU-EMCq8u-esDflXn3OCpVidips3EN5t-ccq8J24azeRD1z3rfqS7j0mvQKOXj3nR8M5A.Wcoe_1nF1hAu2enI-B8mRptRnICCX9LBWf1KAY0xb98&dib_tag=se&keywords=tenergy+05&qid=1767466196&sprefix=tenergy+05%2Caps%2C204&sr=8-1', 'us': '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 79,
             hardness: '36',
             thickness: '2.1 / 1.9 / 1.7',
@@ -454,8 +489,8 @@
             y: 82,
             label: 'Tenergy 05 Hard',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 92,
             hardness: '43',
             thickness: '2.1 / 1.9',
@@ -465,8 +500,8 @@
             y: 81,
             label: 'Tenergy 05 FX',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 65,
             hardness: '32',
             thickness: '2.1 / 1.9 / 1.7',
@@ -476,8 +511,8 @@
             y: 84,
             label: 'Tenergy 19',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 78,
             hardness: '36',
             thickness: '2.1 / 1.9 / 1.7',
@@ -487,8 +522,8 @@
             y: 64,
             label: 'Tenergy 25',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 86,
             hardness: '36',
             thickness: '2.1 / 1.9 / 1.7',
@@ -498,8 +533,8 @@
             y: 62,
             label: 'Tenergy 25 FX',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 72,
             hardness: '32',
             thickness: '2.1 / 1.9 / 1.7',
@@ -509,8 +544,8 @@
             y: 87,
             label: 'Tenergy 64',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 75,
             hardness: '36',
             thickness: '2.1 / 1.9 / 1.7',
@@ -520,8 +555,8 @@
             y: 85,
             label: 'Tenergy 64 FX',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 61,
             hardness: '32',
             thickness: '2.1 / 1.9 / 1.7',
@@ -531,8 +566,8 @@
             y: 85,
             label: 'Tenergy 80',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 77,
             hardness: '36',
             thickness: '2.1 / 1.9 / 1.7',
@@ -542,8 +577,8 @@
             y: 83,
             label: 'Tenergy 80 FX',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             arc: 63,
             hardness: '32',
             thickness: '2.1 / 1.9 / 1.7',
@@ -553,8 +588,8 @@
             y: 88,
             label: 'Zyre 03',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=_U0m4EtsgZk',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=_U0m4EtsgZk', us: 'https://www.youtube.com/watch?v=8CAntgKhKO8' },
             arc: 96,
             hardness: '44',
             thickness: '2.7 / 2.5',
@@ -568,8 +603,8 @@
             y: 125,
             label: 'EL-D',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '1.9 / 2.1',
             strategy: 'OFF- / OFF+',
             control: 83,
@@ -580,8 +615,8 @@
             y: 121,
             label: 'EL-P',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'ALL+ / OFF+',
             control: 83,
@@ -592,8 +627,8 @@
             y: 123,
             label: 'EL-S',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '1.5 / 1,7 / 1,9 / 2,1',
             strategy: 'OFF- / OFF+',
             control: 85,
@@ -604,8 +639,8 @@
             y: 120,
             label: 'FX-D',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '1.9 / 2.1',
             strategy: 'ALL+ / OFF',
             control: 87,
@@ -616,8 +651,8 @@
             y: 120,
             label: 'FX-P',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '1.7 / 1.9 / 2.1',
             strategy: 'ALL / OFF',
             control: 90,
@@ -628,8 +663,8 @@
             y: 118,
             label: 'FX-S',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'ALL+ / OFF',
             control: 87,
@@ -640,8 +675,8 @@
             y: 130,
             label: 'MX-D',
             shape: 'normal',
-            productUrl: 'https://smartstore.naver.com/doublesports/products/5540481632',
-            youtubeUrl: 'https://www.youtube.com/watch?v=haxt_8BOEoo',
+            productUrl: { kr: 'https://smartstore.naver.com/doublesports/products/5540481632', us: 'https://www.tabletennis11.com/other_eng/tibhar-evolution-mx-d' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=haxt_8BOEoo', us: 'https://www.youtube.com/watch?v=uqEat6_r-1A' },
             thickness: '1,9 / 2,1',
             strategy: 'OFF / OFF+',
             control: 75,
@@ -652,8 +687,8 @@
             y: 125,
             label: 'MX-P',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=63MWAt7NNfo',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=63MWAt7NNfo', us: 'https://www.youtube.com/watch?v=WU8gNr9XIcU' },
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'OFF- / OFF+',
             control: 80,
@@ -664,8 +699,8 @@
             y: 128,
             label: 'MX-P 50',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=JVpgPpSdtcg',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=JVpgPpSdtcg', us: '' },
             thickness: '2.1',
             strategy: 'OFF / OFF+',
             control: 75,
@@ -676,8 +711,8 @@
             y: 125,
             label: 'MX-S',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '1.5 / 1.7 / 1.9 / 2.1',
             strategy: 'ALL+ / OFF',
             control: 80,
@@ -688,8 +723,8 @@
             y: 118,
             label: 'K3',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=uY9VcVM2lnE&pp=ygUJ7Yuw67CUIGsz',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=uY9VcVM2lnE&pp=ygUJ7Yuw67CUIGsz', us: 'https://www.youtube.com/watch?v=vzi45Pn2AsU' },
             thickness: '2.0 / MAX',
             strategy: 'OFF+',
             control: 100,
@@ -700,8 +735,8 @@
             y: 115,
             label: 'K3 FX',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '2.0 / MAX',
             strategy: 'OFF',
             control: 105,
@@ -712,8 +747,8 @@
             y: 125,
             label: 'K3 Pro',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '2.0 / MAX',
             strategy: 'OFF+',
             control: 95,
@@ -724,8 +759,8 @@
             y: 124,
             label: 'MK',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '2.0 / MAX',
             strategy: 'OFF',
             control: 96,
@@ -736,8 +771,8 @@
             y: 118,
             label: 'MK FX',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '2.0 / MAX',
             strategy: 'OFF-',
             control: 104,
@@ -748,8 +783,8 @@
             y: 130,
             label: 'MK Pro',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             thickness: '2.0 / MAX',
             strategy: 'OFF+',
             control: 90,
@@ -763,8 +798,8 @@
             y: 60,
             label: 'C52.5',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '52.5',
             weight: '52g',
         },
@@ -773,8 +808,8 @@
             y: 61,
             label: 'C55',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '55',
             weight: '54g',
         },
@@ -783,8 +818,8 @@
             y: 70,
             label: 'C57.5',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '57.5',
             weight: '56g',
         },
@@ -794,8 +829,8 @@
             y: 70,
             label: 'V47.5',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=7ZZFFb38RK0',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=7ZZFFb38RK0', us: 'https://www.youtube.com/watch?v=5lKpiFIH5FY' },
             hardness: '47.5',
             weight: '50g',
         },
@@ -804,8 +839,8 @@
             y: 50,
             label: 'Z52.5',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=iRWkjUaIZGI',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=iRWkjUaIZGI', us: '' },
             hardness: '52.5',
             weight: '54g',
         },
@@ -814,8 +849,8 @@
             y: 60,
             label: 'X47.5',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=UryhwHLv4Ew',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=UryhwHLv4Ew', us: '' },
             hardness: '47.5',
             weight: '51g',
         },
@@ -824,8 +859,8 @@
             y: 51,
             label: 'H52.5',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=rNfimIATn14',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=rNfimIATn14', us: '' },
             hardness: '52.5',
             weight: '52g',
         },
@@ -835,8 +870,8 @@
             y: 60,
             label: 'Sigma 5',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: 'https://www.youtube.com/watch?v=m698fvIxQpY&t=620s',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: 'https://www.youtube.com/watch?v=m698fvIxQpY&t=620s', us: '' },
             hardness: '47.5',
             weight: '46.9g',
         },
@@ -846,8 +881,8 @@
             y: 60,
             label: 'Vega Pro',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '47.5',
             weight: '50g',
         },
@@ -856,8 +891,8 @@
             y: 50,
             label: 'Vega Asia',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '47.5',
             weight: '50g',
         },
@@ -866,8 +901,8 @@
             y: 60,
             label: 'Vega Europe',
             shape: 'normal',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '42.5',
             weight: '50g',
         },
@@ -877,8 +912,8 @@
             y: 41,
             label: 'Tau 3',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '57.5',
             weight: '48g',
         },
@@ -887,8 +922,8 @@
             y: 61,
             label: 'Omega 7Pro',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '47.5',
             weight: '50g',
         },
@@ -897,8 +932,8 @@
             y: 50,
             label: 'China Guang',
             shape: 'hybrid',
-            productUrl: '',
-            youtubeUrl: '',
+            productUrl: { kr: '', us: '' },
+            youtubeUrl: { kr: '', us: '' },
             hardness: '55',
             weight: '50g',
         },
@@ -1050,8 +1085,8 @@
                     const ds = chart.data.datasets[datasetIndex];
                     const pointData = ds.data[dataIndex];
 
-                    const product = normalizeUrl(pointData.productUrl);
-                    const youtube = normalizeUrl(pointData.youtubeUrl);
+                    const product = productUrlForPoint(pointData);
+                    const youtube = youtubeUrlForPoint(pointData);
                     if (product) {
                         window.open(product, '_blank');
                     } else if (youtube) {
@@ -1327,8 +1362,8 @@
 
         const links = document.createElement('div');
         links.className = 'links';
-        const product = normalizeUrl(r.productUrl);
-        const youtube = normalizeUrl(r.youtubeUrl);
+        const product = productUrlForPoint(r);
+        const youtube = youtubeUrlForPoint(r);
         const aShop = makeIconLink('images/sale.png', t('iconSale'), product);
         const aYt = makeIconLink('images/youtube.ico', t('iconYouTube'), youtube);
         if (aShop) links.appendChild(aShop);
@@ -1379,15 +1414,15 @@
     // Default to Butterfly.
     setActiveBrand(BUTTERFLY);
 
-    // Language switch init + handlers.
-    applyLanguageToDom();
+    // Country switch init + handlers.
+    applyCountryToDom();
     applyLanguageToChart(chart);
-    const langSelect = document.getElementById('langSelect');
-    if (langSelect) {
-        langSelect.addEventListener('change', () => {
-            const lang = langSelect.value;
-            if (!lang) return;
-            setLang(lang, chart, tooltipEl);
+    const countrySelect = document.getElementById('countrySelect');
+    if (countrySelect) {
+        countrySelect.addEventListener('change', () => {
+            const country = countrySelect.value;
+            if (!country) return;
+            setCountry(country, chart, tooltipEl);
         });
     }
 
