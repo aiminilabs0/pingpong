@@ -14,5 +14,6 @@ Thumbs.db
 npm-debug.log*
 
 # Doc
-*.md
-
+ARCHITECTURE.md
+README.md
+REFACTORING.md

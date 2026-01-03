@@ -16,10 +16,13 @@ body {
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
         "Segoe UI Emoji";
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    height: 100vh;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 100vh;
     margin: 0;
+    padding: 18px 0;
     color: var(--text);
     background:
         radial-gradient(900px 500px at 18% 18%, rgba(233, 65, 145, 0.16), transparent 60%),
@@ -245,6 +248,110 @@ body {
     /* Important for flexbox: allow the chart area to shrink instead of overflowing
        (otherwise the bottom axis can get clipped when the container has overflow:hidden). */
     min-height: 0;
+}
+
+/* --- Rubber details panel (below chart) --- */
+.rubber-details {
+    width: 80vw;
+    background: rgba(10, 14, 28, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 14px 35px rgba(0,0,0,0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+.rubber-details__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.rubber-details__title {
+    font-size: 13px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.92);
+    letter-spacing: 0.2px;
+}
+.rubber-details__body {
+    margin: 0;
+    padding: 12px;
+    max-height: 28vh;
+    overflow: auto;
+    line-height: 1.5;
+    font-size: 13px;
+    color: rgba(255,255,255,0.78);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+
+/* Markdown content styling inside rubber details */
+.rubber-details__body h1,
+.rubber-details__body h2,
+.rubber-details__body h3,
+.rubber-details__body h4 {
+    margin: 12px 0 8px;
+    line-height: 1.25;
+    color: rgba(255,255,255,0.92);
+}
+.rubber-details__body h3 { font-size: 15px; }
+.rubber-details__body p { margin: 8px 0; }
+.rubber-details__body ul,
+.rubber-details__body ol {
+    margin: 8px 0 8px 20px;
+    padding: 0;
+}
+.rubber-details__body li { margin: 4px 0; }
+.rubber-details__body hr {
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin: 12px 0;
+}
+.rubber-details__body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.10);
+}
+.rubber-details__body pre {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.10);
+    overflow: auto;
+}
+.rubber-details__body pre code {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+.rubber-details__body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 12.5px;
+}
+.rubber-details__body th,
+.rubber-details__body td {
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 8px 10px;
+    vertical-align: top;
+}
+.rubber-details__body th {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.90);
+    font-weight: 800;
+}
+.rubber-details__body a {
+    color: var(--link);
+    text-decoration: none;
+}
+.rubber-details__body a:hover {
+    text-decoration: underline;
 }
 #rubberChart {
     display: block;

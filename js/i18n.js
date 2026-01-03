@@ -6,6 +6,9 @@
 const I18N = {
     en: {
         pageTitle: 'Pingpong Rubber Chart',
+        ariaCountry: 'Country',
+        countryKorea: 'Korea',
+        countryUsa: 'USA',
         ariaBrandTabs: 'Brand',
         brandButterfly: 'Butterfly',
         brandTibhar: 'Tibhar',
@@ -34,6 +37,9 @@ const I18N = {
     },
     ko: {
         pageTitle: '탁구 러버 차트',
+        ariaCountry: '국가',
+        countryKorea: '한국',
+        countryUsa: '미국',
         ariaBrandTabs: '브랜드',
         brandButterfly: '버터플라이',
         brandTibhar: '티바',
@@ -140,6 +146,9 @@ class I18nManager {
         const brandTabs = document.getElementById('brandTabs');
         if (brandTabs) brandTabs.setAttribute('aria-label', this.t('ariaBrandTabs'));
 
+        const langSwitch = document.querySelector('.lang-switch');
+        if (langSwitch) langSwitch.setAttribute('aria-label', this.t('ariaCountry'));
+
         document.querySelectorAll('[data-i18n]').forEach((el) => {
             const key = el.getAttribute('data-i18n');
             if (!key) return;
@@ -147,8 +156,17 @@ class I18nManager {
         });
 
         const select = document.getElementById('countrySelect');
-        if (select && select.value !== this.currentCountry) {
-            select.value = this.currentCountry;
+        if (select) {
+            select.setAttribute('aria-label', this.t('ariaCountry'));
+            // Update option labels based on the active language.
+            Array.from(select.options || []).forEach((opt) => {
+                const v = (opt && opt.value) ? String(opt.value) : '';
+                if (v === 'kr') opt.textContent = `🇰🇷 ${this.t('countryKorea')}`;
+                else if (v === 'us') opt.textContent = `🇺🇸 ${this.t('countryUsa')}`;
+            });
+            if (select.value !== this.currentCountry) {
+                select.value = this.currentCountry;
+            }
         }
     }
 

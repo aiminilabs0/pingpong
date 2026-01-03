@@ -60,6 +60,8 @@ if (countrySelect) {
         if (!country) return;
         i18nManager.setCountry(country, chart, tooltipManager.tooltipEl);
         urlManager.setParams({ country: i18nManager.getCountry() });
+        // If a rubber is currently selected, reload its details in the new language.
+        chartManager.refreshRubberDetailsForCurrentSelection();
     });
 }
 
@@ -69,6 +71,7 @@ document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
         const brand = btn.getAttribute('data-brand');
         if (brand && BRAND_AXIS_RANGES[brand]) {
             chartManager.setActiveBrand(brand);
+            chartManager.clearRubberDetails();
             window.localStorage.setItem('company', brand);
             urlManager.setParams({ company: chartManager.getCurrentBrand() });
             // When switching company/brand, clear any previously selected rubber + YouTube link from the URL.

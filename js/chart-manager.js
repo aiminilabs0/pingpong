@@ -4,6 +4,7 @@
 
 import { BUTTERFLY, TIBHAR, XIOM, BRAND_AXIS_RANGES } from './constants.js';
 import { colorForRubberPoint, mapPointStyle } from './color-utils.js';
+import { renderMarkdown } from './markdown.js';
 
 class ChartManager {
     constructor(canvasId, i18nManager, urlManager, tooltipManager) {
@@ -14,6 +15,90 @@ class ChartManager {
         this.currentBrand = BUTTERFLY;
         this.selectedRubber = null;
         this.chart = null;
+        this._rubberDetailsReqId = 0;
+        this._rubberDetailsEls = null;
+    }
+
+    getRubberDetailsEls() {
+        if (this._rubberDetailsEls) return this._rubberDetailsEls;
+        const container = document.getElementById('rubberDetails');
+        const title = document.getElementById('rubberDetailsTitle');
+        const body = document.getElementById('rubberDetailsBody');
+        if (!container || !title || !body) return null;
+        this._rubberDetailsEls = { container, title, body };
+        return this._rubberDetailsEls;
+    }
+
+    clearRubberDetails() {
+        const els = this.getRubberDetailsEls();
+        if (!els) return;
+        els.title.textContent = '';
+        els.body.innerHTML = '';
+        els.container.hidden = true;
+    }
+
+    async loadRubberDetails(label) {
+        const els = this.getRubberDetailsEls();
+        if (!els) return;
+
+        const rawLabel = String(label || '').trim();
+        if (!rawLabel) {
+            this.clearRubberDetails();
+            return;
+        }
+
+        const reqId = ++this._rubberDetailsReqId;
+        els.container.hidden = false;
+        els.title.textContent = this.i18nManager.localizeRubberName(rawLabel);
+        els.body.textContent = 'Loading…';
+
+        const lang = (this.i18nManager?.getLang?.() || 'en').toLowerCase();
+        const safeLang = (lang === 'ko' || lang === 'en') ? lang : 'en';
+        const baseName = `${encodeURIComponent(rawLabel)}.md`;
+        const primaryUrl = `rubbers/${safeLang}/${baseName}`;
+        const fallbackUrl = `rubbers/${safeLang === 'ko' ? 'en' : 'ko'}/${baseName}`;
+        try {
+            let res = await fetch(primaryUrl, { cache: 'no-store' });
+            if (reqId !== this._rubberDetailsReqId) return; // stale
+            if (!res.ok && res.status === 404) {
+                // If a translation doesn't exist yet, try the other language folder.
+                res = await fetch(fallbackUrl, { cache: 'no-store' });
+                if (reqId !== this._rubberDetailsReqId) return; // stale
+            }
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    els.body.textContent = 'No info yet.';
+                } else {
+                    els.body.textContent = `Failed to load info (${res.status}).`;
+                }
+                return;
+            }
+
+            const text = await res.text();
+            if (reqId !== this._rubberDetailsReqId) return; // stale
+            const md = (text || '').trim();
+            if (!md) {
+                els.body.textContent = 'No info yet.';
+                return;
+            }
+            els.body.innerHTML = renderMarkdown(md);
+        } catch {
+            if (reqId !== this._rubberDetailsReqId) return; // stale
+            els.body.textContent = 'Failed to load info.';
+        }
+    }
+
+    refreshRubberDetailsForCurrentSelection() {
+        const sel = this.selectedRubber;
+        if (!sel || sel.datasetIndex == null || sel.dataIndex == null) return;
+        try {
+            const ds = this.chart?.data?.datasets?.[sel.datasetIndex];
+            const pointData = ds?.data?.[sel.dataIndex] || {};
+            void this.loadRubberDetails(pointData?.label);
+        } catch {
+            // ignore
+        }
     }
 
     createDatasets() {
@@ -265,6 +350,15 @@ class ChartManager {
         const meta = this.chart.getDatasetMeta(match.datasetIndex);
         const el = meta?.data?.[match.dataIndex];
         if (!el) return false;
+
+        // Update the rubber details panel (loaded from /rubbers/<lang>/*.md).
+        try {
+            const ds = this.chart.data.datasets[match.datasetIndex];
+            const pointData = ds?.data?.[match.dataIndex] || {};
+            void this.loadRubberDetails(pointData?.label);
+        } catch {
+            // ignore
+        }
 
         const pos = el.getProps(['x', 'y'], true);
         const active = [{ datasetIndex: match.datasetIndex, index: match.dataIndex }];
