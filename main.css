@@ -181,6 +181,11 @@ body {
     height: 18px;
     object-fit: contain;
 }
+.tab.active img {
+    filter:
+        drop-shadow(0 2px 8px rgba(0,0,0,0.45))
+        drop-shadow(0 0 10px rgba(124, 211, 255, 0.35));
+}
 .lang-switch {
     position: fixed;
     top: 14px;

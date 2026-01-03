@@ -165,11 +165,19 @@
             if (next && typeof next === 'object') {
                 if (next.country) url.searchParams.set('country', String(next.country));
                 if (next.company) url.searchParams.set('company', String(next.company));
+                if (next.rubber) url.searchParams.set('rubber', String(next.rubber));
             }
             window.history.replaceState({}, '', url.toString());
         } catch {
             // ignore
         }
+    }
+
+    function setRubberParamInUrl(label) {
+        const s = (typeof label === 'string' ? label : '').trim();
+        if (!s) return;
+        // Only touch the rubber param; keep country/company exactly as-is.
+        setUrlParams({ rubber: s });
     }
 
     function deleteUrlParam(key) {
@@ -282,6 +290,8 @@
     const XIOM_ICON = 'images/xiom.png';
 
     let currentBrand = BUTTERFLY;
+    let selectedRubber = null; // { datasetIndex, dataIndex }
+    let forcedTooltipPos = null; // { x, y } in canvas coords (relative to canvas-wrap)
 
     // Axis ranges per brand (used by the tabs).
     // Tune these numbers if you want a tighter/looser zoom per brand.
@@ -289,7 +299,7 @@
         // Butterfly includes everything from classic control rubbers to modern high-tension.
         [BUTTERFLY]: { xMin: 55,  xMax: 105, yMin: 60,  yMax: 95 },
         [TIBHAR]:    { xMin: 110, xMax: 135, yMin: 110, yMax: 135 },
-        [XIOM]:      { xMin: 30,  xMax: 90, yMin: 40,  yMax: 80 },
+        [XIOM]:      { xMin: 30,  xMax: 95, yMin: 40,  yMax: 80 },
     };
 
     // Normal Rubber (Orange) - shade by hardness (higher hardness => darker)
@@ -407,6 +417,32 @@
         }
     };
 
+    // Draw a persistent highlight ring around the selected rubber point.
+    const selectedPointHaloPlugin = {
+        id: 'selectedPointHaloPlugin',
+        afterDatasetsDraw(chart) {
+            if (!selectedRubber) return;
+            const { datasetIndex, dataIndex } = selectedRubber || {};
+            if (datasetIndex == null || dataIndex == null) return;
+
+            const meta = chart.getDatasetMeta(datasetIndex);
+            const el = meta?.data?.[dataIndex];
+            if (!el) return;
+
+            const { x, y } = el.getProps(['x', 'y'], true);
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(124, 211, 255, 0.95)';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = 'rgba(124, 211, 255, 0.35)';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+            ctx.restore();
+        }
+    };
+
     const butterflyDataset = {
         label: BUTTERFLY, // Single Category Name
         data: butterflyRubbers,
@@ -512,8 +548,30 @@
                     align: 'right',
                     anchor: 'center',
                     offset: 8,
-                    color: 'rgba(255,255,255,0.88)',
-                    font: { size: 11, weight: 'normal' },
+                    color: (ctx) => {
+                        const isSelected = !!selectedRubber
+                            && ctx?.datasetIndex === selectedRubber.datasetIndex
+                            && ctx?.dataIndex === selectedRubber.dataIndex;
+                        return isSelected ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.82)';
+                    },
+                    font: (ctx) => {
+                        const isSelected = !!selectedRubber
+                            && ctx?.datasetIndex === selectedRubber.datasetIndex
+                            && ctx?.dataIndex === selectedRubber.dataIndex;
+                        return { size: isSelected ? 12 : 11, weight: isSelected ? 'bold' : 'normal' };
+                    },
+                    textStrokeColor: (ctx) => {
+                        const isSelected = !!selectedRubber
+                            && ctx?.datasetIndex === selectedRubber.datasetIndex
+                            && ctx?.dataIndex === selectedRubber.dataIndex;
+                        return isSelected ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0)';
+                    },
+                    textStrokeWidth: (ctx) => {
+                        const isSelected = !!selectedRubber
+                            && ctx?.datasetIndex === selectedRubber.datasetIndex
+                            && ctx?.dataIndex === selectedRubber.dataIndex;
+                        return isSelected ? 3 : 0;
+                    },
                     textAlign: 'left',
                     clamp: true,
                     formatter: function(value) {
@@ -529,17 +587,14 @@
                     const ds = chart.data.datasets[datasetIndex];
                     const pointData = ds.data[dataIndex];
 
-                    const product = productUrlForPoint(pointData);
-                    const youtube = youtubeUrlForPoint(pointData);
-                    if (product) {
-                        window.open(product, '_blank');
-                    } else if (youtube) {
-                        openYouTubeEmbed(youtube);
-                    }
+                    // Make this point shareable via URL.
+                    setRubberParamInUrl(pointData?.label);
+                    // Do NOT navigate to product/youtube on click; just open the info panel.
+                    openRubberInfo({ brand: ds.label, datasetIndex, dataIndex });
                 }
             }
         },
-        plugins: [ChartDataLabels, overlayAlignPlugin]
+        plugins: [ChartDataLabels, overlayAlignPlugin, selectedPointHaloPlugin]
     });
 
     // --- HTML tooltip (clickable links) ---
@@ -749,10 +804,6 @@
         img.src = iconSrc;
         img.alt = altText;
         a.appendChild(img);
-        if (isYouTubeUrl(u)) {
-            a.dataset.youtubeUrl = u;
-            a.addEventListener('click', (e) => maybeEmbedYouTubeClick(e, u));
-        }
         return a;
     }
 
@@ -810,20 +861,31 @@
         const youtube = youtubeUrlForPoint(r);
         const aShop = makeIconLink('images/sale.png', t('iconSale'), product);
         const aYt = makeIconLink('images/youtube.ico', t('iconYouTube'), youtube);
+        // Clicking a rubber's icons should also update the URL to include rubber.
+        if (aShop) aShop.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setRubberParamInUrl(r?.label);
+        });
+        if (aYt) aYt.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setRubberParamInUrl(r?.label);
+        });
         if (aShop) links.appendChild(aShop);
         if (aYt) links.appendChild(aYt);
         if (links.childNodes.length > 0) tooltipEl.appendChild(links);
 
         // Position near the cursor (within canvas-wrap, which is positioned).
         const wrapRect = canvasWrapEl.getBoundingClientRect();
-        const left = Math.min(
-            tooltip.caretX + 12,
-            wrapRect.width - 12
-        );
-        const top = Math.min(
-            tooltip.caretY + 12,
-            wrapRect.height - 12
-        );
+        const desired = forcedTooltipPos;
+        forcedTooltipPos = null; // one-shot: only apply once (URL open)
+
+        const baseX = desired ? desired.x : (tooltip.caretX + 12);
+        const baseY = desired ? desired.y : (tooltip.caretY + 12);
+
+        const left = Math.min(baseX, wrapRect.width - 12);
+        const top = Math.min(baseY, wrapRect.height - 12);
         tooltipEl.style.left = `${left}px`;
         tooltipEl.style.top = `${top}px`;
         tooltipEl.style.display = 'block';
@@ -858,6 +920,7 @@
 
     // Init from URL and/or localStorage.
     const _urlCompanyOrBrand = _urlParams.get('company') || _urlParams.get('brand') || '';
+    const _urlRubber = (_urlParams.get('rubber') || '').trim();
     const _storedCompanyOrBrand = window.localStorage.getItem('company') || window.localStorage.getItem('brand') || '';
     const initialBrand = normalizeBrandParam(_urlCompanyOrBrand) || normalizeBrandParam(_storedCompanyOrBrand) || BUTTERFLY;
 
@@ -901,6 +964,84 @@
             }
         });
     });
+
+    function normalizeRubberParam(raw) {
+        if (typeof raw !== 'string') return '';
+        return raw.trim();
+    }
+
+    function findRubberByLabel(label) {
+        const target = String(label || '').trim().toLowerCase();
+        if (!target) return null;
+
+        const brands = [
+            { brand: BUTTERFLY, datasetIndex: 0, data: butterflyRubbers },
+            { brand: TIBHAR, datasetIndex: 1, data: tibharRubbers },
+            { brand: XIOM, datasetIndex: 2, data: xiomRubbers },
+        ];
+
+        for (const b of brands) {
+            const idx = b.data.findIndex((d) => String(d?.label || '').trim().toLowerCase() === target);
+            if (idx >= 0) return { brand: b.brand, datasetIndex: b.datasetIndex, dataIndex: idx };
+        }
+        return null;
+    }
+
+    function openRubberInfo(match, opts) {
+        if (!match) return false;
+        selectedRubber = { datasetIndex: match.datasetIndex, dataIndex: match.dataIndex };
+        // Ensure the dataset is visible and axes are correct.
+        setActiveBrand(match.brand);
+
+        const meta = chart.getDatasetMeta(match.datasetIndex);
+        const el = meta?.data?.[match.dataIndex];
+        if (!el) return false;
+
+        const pos = el.getProps(['x', 'y'], true);
+        const active = [{ datasetIndex: match.datasetIndex, index: match.dataIndex }];
+
+        // When opening via URL (on load), prefer positioning near the rubber label text.
+        const preferLabel = !!(opts && opts.preferLabelPosition);
+        if (preferLabel) {
+            try {
+                const ds = chart.data.datasets[match.datasetIndex];
+                const pointData = ds?.data?.[match.dataIndex] || {};
+                const labelText = localizeRubberName(pointData?.label || '');
+                const ctx = chart.ctx;
+                // Roughly match the datalabel font.
+                ctx.save();
+                ctx.font = 'bold 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+                const w = ctx.measureText(String(labelText)).width || 0;
+                ctx.restore();
+
+                const pointRadius = 7;
+                const labelOffset = 8;
+                const labelStartX = pos.x + pointRadius + labelOffset;
+                // Place tooltip roughly "beside" the label (near its middle/right),
+                // but clamp so it doesn't drift too far on long names.
+                const labelAnchorX = labelStartX + Math.min(w, 110);
+                forcedTooltipPos = { x: labelAnchorX + 12, y: pos.y - 10 };
+            } catch {
+                forcedTooltipPos = { x: pos.x + 12, y: pos.y + 12 };
+            }
+        } else {
+            forcedTooltipPos = null;
+        }
+
+        chart.setActiveElements(active);
+        // Provide a fallback caret position; if forcedTooltipPos is set,
+        // externalTooltipHandler will use it instead.
+        chart.tooltip.setActiveElements(active, { x: pos.x, y: pos.y });
+        chart.update();
+        return true;
+    }
+
+    // If rubber is in the URL, open its tooltip/info by default.
+    const initialRubber = normalizeRubberParam(_urlRubber);
+    if (initialRubber) {
+        const match = findRubberByLabel(initialRubber);
+        if (match) openRubberInfo(match, { preferLabelPosition: true });
+    }
 
 </script>
 
