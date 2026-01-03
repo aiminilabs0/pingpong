@@ -141,6 +141,47 @@
         us: 'en',
     };
 
+    function getUrlParams() {
+        try {
+            return new URLSearchParams(window.location.search || '');
+        } catch {
+            return new URLSearchParams();
+        }
+    }
+
+    function normalizeBrandParam(raw) {
+        const s = (typeof raw === 'string' ? raw : '').trim().toLowerCase();
+        if (!s) return null;
+        // Return canonical brand strings (do not reference constants defined later).
+        if (s === 'butterfly') return 'Butterfly';
+        if (s === 'tibhar') return 'Tibhar';
+        if (s === 'xiom') return 'XIOM';
+        return null;
+    }
+
+    function setUrlParams(next) {
+        try {
+            const url = new URL(window.location.href);
+            if (next && typeof next === 'object') {
+                if (next.country) url.searchParams.set('country', String(next.country));
+                if (next.company) url.searchParams.set('company', String(next.company));
+            }
+            window.history.replaceState({}, '', url.toString());
+        } catch {
+            // ignore
+        }
+    }
+
+    function deleteUrlParam(key) {
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.delete(String(key));
+            window.history.replaceState({}, '', url.toString());
+        } catch {
+            // ignore
+        }
+    }
+
     function detectDefaultCountry() {
         const nav = (navigator.language || '').toLowerCase();
         return nav.startsWith('ko') ? 'kr' : 'us';
@@ -150,7 +191,11 @@
         return COUNTRY_TO_LANG[country] ? country : 'us';
     }
 
-    let currentCountry = window.localStorage.getItem('country');
+    const _urlParams = getUrlParams();
+    const _urlCountryRaw = (_urlParams.get('country') || '').trim().toLowerCase();
+    const _urlCountry = COUNTRY_TO_LANG[_urlCountryRaw] ? _urlCountryRaw : null;
+
+    let currentCountry = _urlCountry || window.localStorage.getItem('country');
     if (!currentCountry) {
         // Back-compat: old storage key was "lang" with values "ko" / "en".
         const legacyLang = window.localStorage.getItem('lang');
@@ -235,6 +280,8 @@
 
     const XIOM = 'XIOM';
     const XIOM_ICON = 'images/xiom.png';
+
+    let currentBrand = BUTTERFLY;
 
     // Axis ranges per brand (used by the tabs).
     // Tune these numbers if you want a tighter/looser zoom per brand.
@@ -783,6 +830,7 @@
     }
 
     function setActiveBrand(brand) {
+        currentBrand = brand;
         // Ensure exactly one brand is visible.
         chart.setDatasetVisibility(0, brand === BUTTERFLY);
         chart.setDatasetVisibility(1, brand === TIBHAR);
@@ -808,8 +856,24 @@
         });
     }
 
-    // Default to Butterfly.
-    setActiveBrand(BUTTERFLY);
+    // Init from URL and/or localStorage.
+    const _urlCompanyOrBrand = _urlParams.get('company') || _urlParams.get('brand') || '';
+    const _storedCompanyOrBrand = window.localStorage.getItem('company') || window.localStorage.getItem('brand') || '';
+    const initialBrand = normalizeBrandParam(_urlCompanyOrBrand) || normalizeBrandParam(_storedCompanyOrBrand) || BUTTERFLY;
+
+    // Ensure URL overrides persist to localStorage.
+    if (_urlCountry) {
+        window.localStorage.setItem('country', _urlCountry);
+        window.localStorage.setItem('lang', COUNTRY_TO_LANG[_urlCountry] || 'en');
+    }
+    window.localStorage.setItem('company', initialBrand);
+    // Only rewrite the URL on load if the user provided params (canonicalize casing/keys).
+    // Important: changing country should NOT implicitly add/change company.
+    if (_urlCountry) setUrlParams({ country: currentCountry });
+    if (_urlCompanyOrBrand || _urlParams.has('brand')) setUrlParams({ company: initialBrand });
+    if (_urlParams.has('brand')) deleteUrlParam('brand');
+
+    setActiveBrand(initialBrand);
 
     // Country switch init + handlers.
     applyCountryToDom();
@@ -820,6 +884,8 @@
             const country = countrySelect.value;
             if (!country) return;
             setCountry(country, chart, tooltipEl);
+            // Do not touch company when changing country.
+            setUrlParams({ country: currentCountry });
         });
     }
 
@@ -827,7 +893,12 @@
     document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const brand = btn.getAttribute('data-brand');
-            if (brand && BRAND_AXIS_RANGES[brand]) setActiveBrand(brand);
+            if (brand && BRAND_AXIS_RANGES[brand]) {
+                setActiveBrand(brand);
+                window.localStorage.setItem('company', brand);
+                // Do not touch country when changing company.
+                setUrlParams({ company: currentBrand });
+            }
         });
     });
 
