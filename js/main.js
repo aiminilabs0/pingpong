@@ -71,7 +71,7 @@ document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
         const brand = btn.getAttribute('data-brand');
         if (brand && BRAND_AXIS_RANGES[brand]) {
             chartManager.setActiveBrand(brand);
-            chartManager.clearRubberDetails();
+            chartManager.clearRubberSelection({ clearDetails: true });
             window.localStorage.setItem('company', brand);
             urlManager.setParams({ company: chartManager.getCurrentBrand() });
             // When switching company/brand, clear any previously selected rubber + YouTube link from the URL.

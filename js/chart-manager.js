@@ -37,6 +37,35 @@ class ChartManager {
         els.container.hidden = true;
     }
 
+    clearRubberSelection(opts) {
+        const options = opts && typeof opts === 'object' ? opts : {};
+        const clearDetails = options.clearDetails !== false;
+
+        this.selectedRubber = null;
+        this._rubberDetailsReqId++; // invalidate any in-flight details load
+
+        try {
+            this.tooltipManager?.setForcedPosition?.(null);
+        } catch {
+            // ignore
+        }
+
+        try {
+            this.chart?.setActiveElements?.([]);
+            this.chart?.tooltip?.setActiveElements?.([], { x: 0, y: 0 });
+        } catch {
+            // ignore
+        }
+
+        if (clearDetails) this.clearRubberDetails();
+
+        try {
+            this.chart?.update?.();
+        } catch {
+            // ignore
+        }
+    }
+
     async loadRubberDetails(label) {
         const els = this.getRubberDetailsEls();
         if (!els) return;
