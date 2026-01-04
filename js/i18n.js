@@ -40,7 +40,6 @@ const I18N = {
         slotB: 'Rubber 2',
         slotComparison: 'Comparison',
         compareHint: 'Click a point to set Rubber 1. Shift+click to set Rubber 2.',
-        compareInstrLine: '💡 Rubber 1 → Click, Rubber 2 → Shift + Click',
         loading: 'Loading…',
         noInfoYet: 'No info yet.',
         noComparisonYet: 'No comparison yet.'
@@ -81,7 +80,6 @@ const I18N = {
         slotB: '러버 2',
         slotComparison: '비교',
         compareHint: '차트에서 클릭하면 러버 1, Shift+클릭하면 러버 2로 선택됩니다.',
-        compareInstrLine: '💡 러버1 → Click, 러버2 → Shift + Click',
         loading: '불러오는 중…',
         noInfoYet: '정보가 아직 없습니다.',
         noComparisonYet: '비교 정보가 아직 없습니다.'
@@ -173,7 +171,6 @@ class I18nManager {
             const key = el.getAttribute('data-i18n');
             if (!key) return;
 
-            // Special-case: we want per-token coloring ("Rubber 1/2") which requires HTML spans.
             if (key === 'compareInstrLine') {
                 el.innerHTML = this.getCompareInstrLineHtml();
                 return;
@@ -229,9 +226,9 @@ class I18nManager {
 
     getCompareInstrLineHtml() {
         if (this.currentLang === 'ko') {
-            return '💡 <span class="compare-instruction__slot compare-instruction__slot--a">러버1</span> → Click, <span class="compare-instruction__slot compare-instruction__slot--b">러버2</span> → Shift + Click';
+            return '💡 비교: <span class="compare-instruction__slot compare-instruction__slot--a">러버1</span> 클릭 / <span class="compare-instruction__slot compare-instruction__slot--b">러버2</span> Shift+클릭';
         }
-        return '💡 <span class="compare-instruction__slot compare-instruction__slot--a">Rubber 1</span> → Click, <span class="compare-instruction__slot compare-instruction__slot--b">Rubber 2</span> → Shift + Click';
+        return '💡 Compare: Click <span class="compare-instruction__slot compare-instruction__slot--a">Rubber 1</span>, Shift+click <span class="compare-instruction__slot compare-instruction__slot--b">Rubber 2</span>';
     }
 }
 
