@@ -136,6 +136,7 @@ class TooltipManager {
 
         const dp = tooltip?.dataPoints?.[0];
         const r = dp?.raw ?? {};
+        const alreadyVisible = this.tooltipEl.style.display === 'block' || this.tooltipEl.classList.contains('show');
         clearEl(this.tooltipEl);
 
         const head = document.createElement('div');
@@ -208,9 +209,14 @@ class TooltipManager {
         this.tooltipEl.style.left = `${left}px`;
         this.tooltipEl.style.top = `${top}px`;
         this.tooltipEl.style.display = 'block';
-        this.tooltipEl.classList.remove('show');
-        void this.tooltipEl.offsetWidth;
-        this.tooltipEl.classList.add('show');
+        // Avoid "blink" by not re-triggering the enter animation when we're already visible.
+        if (!alreadyVisible) {
+            this.tooltipEl.classList.remove('show');
+            void this.tooltipEl.offsetWidth; // force reflow to restart CSS transition once
+            this.tooltipEl.classList.add('show');
+        } else {
+            this.tooltipEl.classList.add('show');
+        }
     }
 }
 

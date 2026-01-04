@@ -95,7 +95,8 @@ class ChartManager {
         if (clearDetails) this.clearRubberDetails();
 
         try {
-            this.chart?.update?.();
+            // Avoid click "blink" by skipping chart animations for selection updates.
+            this.chart?.update?.('none');
         } catch {
             // ignore
         }
@@ -121,7 +122,8 @@ class ChartManager {
         }
 
         try {
-            this.chart?.update?.();
+            // Avoid click "blink" by skipping chart animations for focus changes.
+            this.chart?.update?.('none');
         } catch {
             // ignore
         }
@@ -548,7 +550,8 @@ class ChartManager {
             this.chart.options.scales.y.max = r.yMax;
         }
 
-        this.chart.update();
+        // Keep brand switching snappy and avoid animation flashes.
+        this.chart.update('none');
 
         const tabs = document.querySelectorAll('.tab[data-brand]');
         tabs.forEach((btn) => {
@@ -629,7 +632,7 @@ class ChartManager {
 
         if (noBrandSwitch || !el) {
             this.updateComparisonPanel();
-            try { this.chart?.update?.(); } catch { /* ignore */ }
+            try { this.chart?.update?.('none'); } catch { /* ignore */ }
             return true;
         }
 
@@ -662,7 +665,8 @@ class ChartManager {
 
         this.chart.setActiveElements(active);
         this.chart.tooltip.setActiveElements(active, { x: pos.x, y: pos.y });
-        this.chart.update();
+        // Avoid click "blink" by skipping chart animations for selection updates.
+        this.chart.update('none');
 
         // Trigger comparison load if both are selected.
         this.updateComparisonPanel();
