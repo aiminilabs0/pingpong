@@ -6,7 +6,7 @@
     <title>AI PingPong</title>
     <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
     <!-- Bump this value on deploy to bust browser caches for local assets (CSS/JS). -->
-    <meta name="app-version" content="0.0.3" />
+    <meta name="app-version" content="0.0.4" />
     <script>
         (function () {
             const v = document.querySelector('meta[name="app-version"]')?.content || "";
@@ -99,6 +99,10 @@
             </div>
         </div>
         <div class="shape-legend" aria-hidden="true">
+            <div class="row">
+                <span class="marker badgeB">B</span>
+                <span data-i18n="legendBestSeller">BestSeller</span>
+            </div>
             <div class="row">
                 <span class="marker circle"></span>
                 <span data-i18n="legendPimplesIn">Pimples-in</span>
