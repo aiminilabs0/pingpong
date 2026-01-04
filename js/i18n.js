@@ -39,7 +39,7 @@ const I18N = {
         pageTitle: '탁구 러버 차트',
         ariaCountry: '국가',
         countryKorea: '한국',
-        countryUsa: '미국',
+        countryUsa: 'USA',
         ariaBrandTabs: '브랜드',
         brandButterfly: '버터플라이',
         brandTibhar: '티바',
