@@ -593,13 +593,20 @@ body {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 900;
     line-height: 1;
     color: rgba(255,255,255,0.98);
-    background: rgba(0,0,0,0.22);
-    border: 1px solid rgba(255,255,255,0.35);
+    background: #EF6C00;
+    border: 1px solid rgba(255,255,255,0);
     border-radius: 4px;
+    /* Match the main chart's "B" which uses a subtle dark stroke for contrast. */
+    -webkit-text-stroke: 1px rgba(0,0,0,0);
+    text-shadow:
+        -1px 0 rgba(0,0,0,0.55),
+        1px 0 rgba(0,0,0,0.55),
+        0 -1px rgba(0,0,0,0.55),
+        0 1px rgba(0,0,0,0.55);
 }
 .hardness-legend {
     position: absolute;
