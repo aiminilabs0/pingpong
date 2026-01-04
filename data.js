@@ -51,8 +51,8 @@ const RUBBER_NAME_KO = {
 
     'Sigma 5': '시그마 5',
     'Tau 3': '타우 3',
-    'Omega 7Pro': '오메가7 프로',
-    'China Guang': '차이나광',
+    'Omega7 Pro': '오메가7 프로',
+    'Guang': '광',
 
     // Vega series
     'Vega Pro': '베가 프로',
@@ -589,7 +589,7 @@ const xiomRubbers = [
     {
         x: 64,
         y: 61,
-        label: 'Omega 7Pro',
+        label: 'Omega7 Pro',
         shape: 'hybrid',
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: '', us: '' },
@@ -599,7 +599,7 @@ const xiomRubbers = [
     {
         x: 67,
         y: 50,
-        label: 'China Guang',
+        label: 'Guang',
         shape: 'hybrid',
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: '', us: '' },

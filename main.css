@@ -253,10 +253,14 @@ body {
 /* --- Rubber details panel (below chart) --- */
 .rubber-details {
     width: 80vw;
-    background: rgba(10, 14, 28, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 14px;
-    box-shadow: 0 14px 35px rgba(0,0,0,0.45);
+    max-width: 980px;
+    background:
+        radial-gradient(700px 160px at 18% 0%, rgba(124, 211, 255, 0.10), transparent 65%),
+        radial-gradient(700px 160px at 82% 0%, rgba(233, 65, 145, 0.08), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(10, 14, 28, 0.55));
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 16px;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.45);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     overflow: hidden;
@@ -265,23 +269,25 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 12px;
+    padding: 12px 14px;
     border-bottom: 1px solid rgba(255,255,255,0.10);
 }
 .rubber-details__title {
-    font-size: 13px;
-    font-weight: 800;
-    color: rgba(255,255,255,0.92);
-    letter-spacing: 0.2px;
+    font-size: 14px;
+    font-weight: 950;
+    letter-spacing: 0.25px;
+    color: rgba(255,255,255,0.96);
+    text-shadow: 0 1px 12px rgba(0,0,0,0.55);
 }
 .rubber-details__body {
     margin: 0;
-    padding: 12px;
-    max-height: 28vh;
-    overflow: auto;
-    line-height: 1.5;
-    font-size: 13px;
-    color: rgba(255,255,255,0.78);
+    padding: 14px 16px 16px;
+    /* Remove inner scrollbars: let the page scroll naturally. */
+    max-height: none;
+    overflow: visible;
+    line-height: 1.65;
+    font-size: 14px;
+    color: rgba(255,255,255,0.82);
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -290,18 +296,29 @@ body {
 .rubber-details__body h2,
 .rubber-details__body h3,
 .rubber-details__body h4 {
-    margin: 12px 0 8px;
+    margin: 14px 0 8px;
     line-height: 1.25;
     color: rgba(255,255,255,0.92);
 }
+.rubber-details__body h1 { font-size: 18px; letter-spacing: 0.2px; }
+.rubber-details__body h2 { font-size: 16px; letter-spacing: 0.15px; }
 .rubber-details__body h3 { font-size: 15px; }
-.rubber-details__body p { margin: 8px 0; }
+.rubber-details__body p { margin: 10px 0; }
+.rubber-details__body strong { color: rgba(255,255,255,0.92); }
 .rubber-details__body ul,
 .rubber-details__body ol {
     margin: 8px 0 8px 20px;
     padding: 0;
 }
 .rubber-details__body li { margin: 4px 0; }
+.rubber-details__body blockquote {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border-left: 3px solid rgba(124, 211, 255, 0.55);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.18);
+    color: rgba(255,255,255,0.80);
+}
 .rubber-details__body hr {
     border: 0;
     border-top: 1px solid rgba(255,255,255,0.12);
@@ -348,10 +365,12 @@ body {
 }
 .rubber-details__body a {
     color: var(--link);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: rgba(124, 211, 255, 0.45);
+    text-underline-offset: 2px;
 }
 .rubber-details__body a:hover {
-    text-decoration: underline;
+    text-decoration-color: rgba(124, 211, 255, 0.75);
 }
 #rubberChart {
     display: block;
