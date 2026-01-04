@@ -3,12 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pingpong Rubber Chart</title>
+    <title>AI PingPong</title>
     <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="main.css" />
+    <!-- Bump this value on deploy to bust browser caches for local assets (CSS/JS). -->
+    <meta name="app-version" content="0.0.3" />
+    <script>
+        (function () {
+            const v = document.querySelector('meta[name="app-version"]')?.content || "";
+            const qs = v ? `?v=${encodeURIComponent(v)}` : "";
+            document.write(`<link rel="stylesheet" href="main.css${qs}" />`);
+            document.write(`<script src="data.js${qs}"><\/script>`);
+
+            // Ensure ES module dependency imports under /js/ also get the same cache-busting version.
+            // This is needed because `js/main.js?v=...` does NOT automatically propagate to `import './x.js'`.
+            // Map the *resolved* dependency URLs (e.g. "/js/i18n.js") to versioned URLs.
+            // Relative imports like `import "./i18n.js"` from /js/main.js resolve to "/js/i18n.js".
+            const importMap = {
+                imports: {
+                    "/js/i18n.js": `/js/i18n.js${qs}`,
+                    "/js/url-manager.js": `/js/url-manager.js${qs}`,
+                    "/js/tooltip.js": `/js/tooltip.js${qs}`,
+                    "/js/chart-manager.js": `/js/chart-manager.js${qs}`,
+                    "/js/constants.js": `/js/constants.js${qs}`,
+                    "/js/youtube-embed.js": `/js/youtube-embed.js${qs}`,
+                    "/js/color-utils.js": `/js/color-utils.js${qs}`,
+                    "/js/markdown.js": `/js/markdown.js${qs}`
+                }
+            };
+            document.write(`<script type="importmap">${JSON.stringify(importMap)}<\/script>`);
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="data.js"></script>
 </head>
 <body>
 
@@ -117,7 +143,16 @@
     </section>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<script>
+    (function () {
+        const v = document.querySelector('meta[name="app-version"]')?.content || "";
+        const qs = v ? `?v=${encodeURIComponent(v)}` : "";
+        const s = document.createElement("script");
+        s.type = "module";
+        s.src = `js/main.js${qs}`;
+        document.body.appendChild(s);
+    })();
+</script>
 
 </body>
 </html>
