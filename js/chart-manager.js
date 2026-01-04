@@ -6,6 +6,21 @@ import { BUTTERFLY, TIBHAR, XIOM, BRAND_AXIS_RANGES } from './constants.js';
 import { colorForRubberPoint, mapPointStyle } from './color-utils.js';
 import { renderMarkdown } from './markdown.js';
 
+// Global scale for anything drawn inside the Chart.js canvas (fonts, point radius, etc).
+// Increased by +20% twice total (1.2 * 1.2 = 1.44) per UI sizing request.
+const CHART_SCALE_20 = 1.44;
+const CHART_POINT_RADIUS = 7 * CHART_SCALE_20;
+const CHART_POINT_HOVER_RADIUS = 9 * CHART_SCALE_20;
+const CHART_TICK_FONT_SIZE = 12 * CHART_SCALE_20;
+const CHART_AXIS_TITLE_FONT_SIZE = 16 * CHART_SCALE_20;
+const CHART_TICK_PADDING = 8 * CHART_SCALE_20;
+const CHART_DATALABEL_OFFSET = 8 * CHART_SCALE_20;
+const CHART_DATALABEL_FONT_SIZE = 11 * CHART_SCALE_20;
+const CHART_DATALABEL_FONT_SIZE_SELECTED = 12 * CHART_SCALE_20;
+const CHART_SELECTED_TEXT_STROKE_WIDTH = 3 * CHART_SCALE_20;
+const CHART_BEST_SELLER_BADGE_FONT_SIZE = 9.5 * CHART_SCALE_20;
+const CHART_LABEL_MEASURE_FONT_SIZE = 12 * CHART_SCALE_20;
+
 class ChartManager {
     constructor(canvasId, i18nManager, urlManager, tooltipManager) {
         this.canvasId = canvasId;
@@ -344,8 +359,8 @@ class ChartManager {
                 pointBackgroundColor: butterflyRubbers.map(d => colorForRubberPoint(d, BUTTERFLY, butterflyRubbers)),
                 pointBorderColor: butterflyRubbers.map(d => colorForRubberPoint(d, BUTTERFLY, butterflyRubbers)),
                 pointStyle: butterflyRubbers.map(d => mapPointStyle(d.shape)),
-                pointRadius: 7,
-                pointHoverRadius: 9
+                pointRadius: CHART_POINT_RADIUS,
+                pointHoverRadius: CHART_POINT_HOVER_RADIUS
             },
             {
                 label: TIBHAR,
@@ -353,8 +368,8 @@ class ChartManager {
                 pointBackgroundColor: tibharRubbers.map(d => colorForRubberPoint(d, TIBHAR, tibharRubbers)),
                 pointBorderColor: tibharRubbers.map(d => colorForRubberPoint(d, TIBHAR, tibharRubbers)),
                 pointStyle: tibharRubbers.map(d => mapPointStyle(d.shape ?? 'normal')),
-                pointRadius: 7,
-                pointHoverRadius: 9
+                pointRadius: CHART_POINT_RADIUS,
+                pointHoverRadius: CHART_POINT_HOVER_RADIUS
             },
             {
                 label: XIOM,
@@ -362,8 +377,8 @@ class ChartManager {
                 pointBackgroundColor: xiomRubbers.map(d => colorForRubberPoint(d, XIOM, xiomRubbers)),
                 pointBorderColor: xiomRubbers.map(d => colorForRubberPoint(d, XIOM, xiomRubbers)),
                 pointStyle: xiomRubbers.map(d => mapPointStyle(d.shape ?? 'normal')),
-                pointRadius: 7,
-                pointHoverRadius: 9
+                pointRadius: CHART_POINT_RADIUS,
+                pointHoverRadius: CHART_POINT_HOVER_RADIUS
             }
         ];
     }
@@ -397,7 +412,7 @@ class ChartManager {
 
                 ctx.save();
                 // Keep the badge compact and readable on both circle + rotated-rect markers.
-                ctx.font = '900 9.5px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+                ctx.font = `900 ${CHART_BEST_SELLER_BADGE_FONT_SIZE}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -422,7 +437,7 @@ class ChartManager {
                         if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
 
                         // Subtle dark stroke to keep the white "B" readable on bright fills.
-                        ctx.lineWidth = 3;
+                        ctx.lineWidth = CHART_SELECTED_TEXT_STROKE_WIDTH;
                         ctx.strokeStyle = 'rgba(0,0,0,0.55)';
                         ctx.strokeText('B', x, y + 0.2);
                         ctx.fillStyle = 'rgba(255,255,255,0.98)';
@@ -461,12 +476,13 @@ class ChartManager {
                         ticks: {
                             display: true,
                             color: 'rgba(255,255,255,0.55)',
-                            padding: 8
+                            padding: CHART_TICK_PADDING,
+                            font: { size: CHART_TICK_FONT_SIZE, weight: 'normal' }
                         },
                         title: {
                             display: true,
                             text: this.i18nManager.t('axisSpin'),
-                            font: { size: 16, weight: 'normal' },
+                            font: { size: CHART_AXIS_TITLE_FONT_SIZE, weight: 'normal' },
                             color: 'rgba(255,255,255,0.88)',
                             padding: { top: 10 }
                         },
@@ -482,12 +498,13 @@ class ChartManager {
                         ticks: {
                             display: true,
                             color: 'rgba(255,255,255,0.55)',
-                            padding: 8
+                            padding: CHART_TICK_PADDING,
+                            font: { size: CHART_TICK_FONT_SIZE, weight: 'normal' }
                         },
                         title: {
                             display: true,
                             text: this.i18nManager.t('axisSpeed'),
-                            font: { size: 16, weight: 'normal' },
+                            font: { size: CHART_AXIS_TITLE_FONT_SIZE, weight: 'normal' },
                             color: 'rgba(255,255,255,0.88)'
                         },
                         grid: {
@@ -509,7 +526,7 @@ class ChartManager {
                     datalabels: {
                         align: 'right',
                         anchor: 'center',
-                        offset: 8,
+                        offset: CHART_DATALABEL_OFFSET,
                         color: (ctx) => {
                             const isSelectedA = !!this.selectedRubber
                                 && ctx?.datasetIndex === this.selectedRubber.datasetIndex
@@ -529,7 +546,10 @@ class ChartManager {
                                 && ctx?.datasetIndex === this.selectedRubberB.datasetIndex
                                 && ctx?.dataIndex === this.selectedRubberB.dataIndex;
                             const isSelected = isSelectedA || isSelectedB;
-                            return { size: isSelected ? 12 : 11, weight: isSelected ? 'bold' : 'normal' };
+                            return {
+                                size: isSelected ? CHART_DATALABEL_FONT_SIZE_SELECTED : CHART_DATALABEL_FONT_SIZE,
+                                weight: isSelected ? 'bold' : 'normal'
+                            };
                         },
                         textStrokeColor: (ctx) => {
                             const isSelectedA = !!this.selectedRubber
@@ -549,7 +569,7 @@ class ChartManager {
                                 && ctx?.datasetIndex === this.selectedRubberB.datasetIndex
                                 && ctx?.dataIndex === this.selectedRubberB.dataIndex;
                             const isSelected = isSelectedA || isSelectedB;
-                            return isSelected ? 3 : 0;
+                            return isSelected ? CHART_SELECTED_TEXT_STROKE_WIDTH : 0;
                         },
                         textAlign: 'left',
                         clamp: true,
@@ -695,12 +715,12 @@ class ChartManager {
                 const labelText = this.i18nManager.localizeRubberName(pointData?.label || '');
                 const ctx = this.chart.ctx;
                 ctx.save();
-                ctx.font = 'bold 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+                ctx.font = `bold ${CHART_LABEL_MEASURE_FONT_SIZE}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial`;
                 const w = ctx.measureText(String(labelText)).width || 0;
                 ctx.restore();
 
-                const pointRadius = 7;
-                const labelOffset = 8;
+                const pointRadius = CHART_POINT_RADIUS;
+                const labelOffset = CHART_DATALABEL_OFFSET;
                 const labelStartX = pos.x + pointRadius + labelOffset;
                 const labelAnchorX = labelStartX + Math.min(w, 110);
                 this.tooltipManager.setForcedPosition({ x: labelAnchorX + 12, y: pos.y - 10 });

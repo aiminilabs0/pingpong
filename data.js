@@ -529,8 +529,8 @@ const xiomRubbers = [
         weight: '52g',
     },
     {
-        x: 80,
-        y: 61,
+        x: 78,
+        y: 62,
         label: 'C55',
         shape: 'hybrid',
         bestSeller: true,
@@ -540,7 +540,7 @@ const xiomRubbers = [
         weight: '54g',
     },
     {
-        x: 75,
+        x: 73,
         y: 70,
         label: 'C57.5',
         shape: 'hybrid',
@@ -571,8 +571,8 @@ const xiomRubbers = [
         weight: '54g',
     },
     {
-        x: 67,
-        y: 60,
+        x: 66,
+        y: 59,
         label: 'X47.5',
         shape: 'normal',
         productUrl: { kr: '', us: '' },
