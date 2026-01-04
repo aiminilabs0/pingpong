@@ -256,37 +256,24 @@ body {
 .compare-instruction {
     position: relative;
     z-index: 1;
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: rgba(10, 14, 28, 0.62);
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: rgba(255,255,255,0.78);
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: rgba(255,255,255,0.70);
     font-size: 12px;
     line-height: 1.25;
     pointer-events: none;
     max-width: min(360px, calc(100% - 16px));
-    margin: 0 auto 0 0;
+    text-align: center;
+    margin: 6px auto 10px auto;
 }
-.compare-instruction__title {
-    font-weight: 900;
-    letter-spacing: 0.2px;
-    color: rgba(255,255,255,0.86);
-    margin-bottom: 6px;
-}
-.compare-instruction__item {
-    display: flex;
-    gap: 8px;
+.compare-instruction__line {
+    display: inline-block;
     white-space: nowrap;
-}
-.compare-instruction__item + .compare-instruction__item {
-    margin-top: 4px;
-}
-.compare-instruction__bullet {
-    flex: 0 0 auto;
-    color: rgba(255,255,255,0.70);
 }
 
 /* --- Rubber details panel (below chart) --- */

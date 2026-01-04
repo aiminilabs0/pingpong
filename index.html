@@ -37,18 +37,6 @@
         </button>
     </div>
 
-    <div class="compare-instruction" aria-hidden="true">
-        <div class="compare-instruction__title" data-i18n="compareInstrTitle">Compare:</div>
-        <div class="compare-instruction__item">
-            <span class="compare-instruction__bullet">•</span>
-            <span data-i18n="compareInstrFirst">Rubber 1 → Click</span>
-        </div>
-        <div class="compare-instruction__item">
-            <span class="compare-instruction__bullet">•</span>
-            <span data-i18n="compareInstrSecond">Rubber 2 → Shift + Click</span>
-        </div>
-    </div>
-
     <div class="canvas-wrap">
         <canvas id="rubberChart"></canvas>
         <div class="hardness-legend" aria-hidden="true">
@@ -94,6 +82,10 @@
                 <span data-i18n="legendHybrid">Hybrid</span>
             </div>
         </div>
+    </div>
+
+    <div class="compare-instruction" aria-hidden="true">
+        <span class="compare-instruction__line" data-i18n="compareInstrLine">Rubber 1 → Click, Rubber 2 → Shift + Click</span>
     </div>
 
     <!-- Rubber compare panel (loaded from /rubbers/<lang>/*.md and /rubbers/comparison/<lang>/*.md) -->
