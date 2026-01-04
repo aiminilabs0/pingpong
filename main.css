@@ -444,7 +444,7 @@ body {
     max-height: none;
     overflow: visible;
     line-height: 1.65;
-    font-size: 20.16px;
+    font-size: 16px;
     color: rgba(255,255,255,0.82);
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
@@ -458,9 +458,9 @@ body {
     line-height: 1.25;
     color: rgba(255,255,255,0.92);
 }
-.rubber-details__body h1 { font-size: 25.92px; letter-spacing: 0.2px; }
-.rubber-details__body h2 { font-size: 23.04px; letter-spacing: 0.15px; }
-.rubber-details__body h3 { font-size: 21.6px; }
+.rubber-details__body h1 { font-size: 20px; letter-spacing: 0.2px; }
+.rubber-details__body h2 { font-size: 18px; letter-spacing: 0.15px; }
+.rubber-details__body h3 { font-size: 16px; }
 .rubber-details__body p { margin: 10px 0; }
 .rubber-details__body strong { color: rgba(255,255,255,0.92); }
 .rubber-details__body ul,
@@ -484,7 +484,7 @@ body {
 }
 .rubber-details__body code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-size: 17.28px;
+    font-size: 14px;
     padding: 2px 6px;
     border-radius: 8px;
     background: rgba(255,255,255,0.07);
@@ -508,7 +508,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin: 10px 0;
-    font-size: 18px;
+    font-size: calc(18px * 0.8);
 }
 .rubber-details__body th,
 .rubber-details__body td {
