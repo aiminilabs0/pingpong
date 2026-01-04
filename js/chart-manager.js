@@ -386,8 +386,56 @@ class ChartManager {
                 shapeLegend.style.right = `${right}px`;
             }
         };
+
+        // Draw a "B" badge inside the point marker for best-seller rubbers.
+        // Enable by setting `bestSeller: true` on the rubber point object in `data.js`.
+        const bestSellerBadgePlugin = {
+            id: 'bestSellerBadgePlugin',
+            afterDatasetsDraw: (chart) => {
+                const ctx = chart?.ctx;
+                if (!ctx) return;
+
+                ctx.save();
+                // Keep the badge compact and readable on both circle + rotated-rect markers.
+                ctx.font = '900 9.5px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const datasets = chart?.data?.datasets || [];
+                for (let di = 0; di < datasets.length; di++) {
+                    if (chart.isDatasetVisible && !chart.isDatasetVisible(di)) continue;
+
+                    const ds = datasets[di];
+                    const data = ds?.data || [];
+                    const meta = chart.getDatasetMeta?.(di);
+                    const els = meta?.data || [];
+
+                    for (let pi = 0; pi < data.length; pi++) {
+                        const d = data[pi] || {};
+                        if (!d.bestSeller) continue;
+                        const el = els[pi];
+                        if (!el) continue;
+
+                        const pos = el.getProps ? el.getProps(['x', 'y'], true) : { x: el.x, y: el.y };
+                        const x = pos?.x;
+                        const y = pos?.y;
+                        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+
+                        // Subtle dark stroke to keep the white "B" readable on bright fills.
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+                        ctx.strokeText('B', x, y + 0.2);
+                        ctx.fillStyle = 'rgba(255,255,255,0.98)';
+                        ctx.fillText('B', x, y + 0.2);
+                    }
+                }
+
+                ctx.restore();
+            }
+        };
+
         // No circle highlight/halo: we highlight selections via label color instead.
-        return [overlayAlignPlugin];
+        return [overlayAlignPlugin, bestSellerBadgePlugin];
     }
 
     createChart() {

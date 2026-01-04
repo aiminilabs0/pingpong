@@ -142,13 +142,29 @@ class TooltipManager {
         const head = document.createElement('div');
         head.className = 'head';
 
-        const title = document.createElement('div');
-        title.className = 't';
-        title.textContent = `${this.i18nManager.localizeRubberName(r.label ?? '')}`;
-
         const country = this.i18nManager.getCountry();
         const product = productUrlForPoint(r, country);
         const youtube = youtubeUrlForPoint(r, country);
+        
+        // Create clickable title that links to the product page
+        const title = document.createElement('div');
+        title.className = 't';
+        
+        if (product) {
+            const titleLink = document.createElement('a');
+            titleLink.href = product;
+            titleLink.target = '_blank';
+            titleLink.rel = 'noopener noreferrer';
+            titleLink.className = 'tooltip-title-link';
+            titleLink.textContent = this.i18nManager.localizeRubberName(r.label ?? '');
+            titleLink.addEventListener('click', () => {
+                this.urlManager.setRubberParam(r?.label);
+            });
+            title.appendChild(titleLink);
+        } else {
+            title.textContent = this.i18nManager.localizeRubberName(r.label ?? '');
+        }
+
         const shopMeta = shopIconMetaForUrl(product, country, this.i18nManager);
         const aShop = shopMeta ? makeIconLink(shopMeta.src, shopMeta.alt, product) : null;
         const aYt = makeIconLink('images/youtube.ico', this.i18nManager.t('iconYouTube'), youtube);

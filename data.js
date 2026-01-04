@@ -1,5 +1,7 @@
 // Rubber data (names + points) extracted from index.html.
 // Edit this file to add/modify rubbers without touching the chart logic/UI.
+// Optional fields per rubber:
+// - bestSeller: true   -> Draws a "B" inside the chart point marker.
 
 // Rubber name localization (used by point labels + tooltip title)
 const RUBBER_NAME_KO = {
@@ -78,6 +80,7 @@ const butterflyRubbers = [
         y: 79,
         label: 'Dignics 09C',
         shape: 'hybrid',
+        bestSeller: true,
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: '', us: '' },
         arc: 96,
@@ -133,6 +136,7 @@ const butterflyRubbers = [
         y: 83,
         label: 'Rozena',
         shape: 'normal',
+        bestSeller: true,
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: '', us: '' },
         arc: 75,
@@ -144,6 +148,7 @@ const butterflyRubbers = [
         y: 83,
         label: 'Tenergy 05',
         shape: 'normal',
+        bestSeller: true,
         productUrl: {
             kr: 'https://www.coupang.com/vp/products/8414405864?itemId=24331707549&vendorItemId=92706240298&q=%ED%85%8C%EB%84%88%EC%A7%8005&searchId=d10be3d818557427&sourceType=search&itemsCount=36&searchRank=0&rank=0&traceId=mjxipwjc',
             us: 'https://www.amazon.com/Butterfly-2-1-Tenergy-Rubber-Black/dp/B0018LMC9C/ref=sr_1_1?crid=2GT84PTP4SREU&dib=eyJ2IjoiMSJ9.LipPUoRPG3IUAnbR6WG2OEaD5RGNR3ykblpma6WFfQw0hclqD7zKsjJ0JuO3DeoxwWwphOm-MsrbFUQY0H3pts85663obxnhp93ukq-0ZkUW2J8qD0Q1bI6DF5P7BiKwkAVe-tmcfn2SnEWo5toUfBgcAePef22I1M0zB9lPGbDeo8S-2_zfDkQnBnzdCzb-Vjxi8tgB1-1oj9RPGfUgKVviDV5L8N7IzcAUPfCU-EMCq8u-esDflXn3OCpVidips3EN5t-ccq8J24azeRD1z3rfqS7j0mvQKOXj3nR8M5A.Wcoe_1nF1hAu2enI-B8mRptRnICCX9LBWf1KAY0xb98&dib_tag=se&keywords=tenergy+05&qid=1767466196&sprefix=tenergy+05%2Caps%2C204&sr=8-1',
@@ -392,6 +397,7 @@ const tibharRubbers = [
         y: 118,
         label: 'K3',
         shape: 'hybrid',
+        bestSeller: true,
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: 'https://www.youtube.com/watch?v=uY9VcVM2lnE&pp=ygUJ7Yuw67CUIGsz', us: 'https://www.youtube.com/watch?v=vzi45Pn2AsU' },
         thickness: '2.0 / MAX',
@@ -459,6 +465,56 @@ const tibharRubbers = [
         control: 90,
         hardness: '51',
     },
+    {
+        x: 122,
+        y: 121,
+        label: 'MX-K',
+        shape: 'normal',
+        bestSeller: true,
+        productUrl: { kr: '', us: '' },
+        youtubeUrl: { kr: '', us: '' },
+        thickness: '2.1',
+        strategy: 'OFF+/OFF',
+        control: 85,
+        hardness: '47.5',
+    },
+    {
+        x: 123,
+        y: 123,
+        label: 'MX-K(H)',
+        shape: 'normal',
+        productUrl: { kr: '', us: '' },
+        youtubeUrl: { kr: 'https://www.youtube.com/watch?v=_X9u43es_-s', us: '' },
+        thickness: '2.1',
+        strategy: 'OFF+',
+        control: 85,
+        hardness: '52.5',
+    },
+    {
+        x: 124,
+        y: 122,
+        label: 'MX-K Pro',
+        shape: 'normal',
+        bestSeller: true,
+        productUrl: { kr: '', us: '' },
+        youtubeUrl: { kr: '', us: '' },
+        thickness: '2.3',
+        strategy: 'OFF+',
+        control: 80,
+        hardness: '47.5',
+    },
+    {
+        x: 125,
+        y: 124,
+        label: 'MX-K(H) Pro',
+        shape: 'normal',
+        productUrl: { kr: '', us: '' },
+        youtubeUrl: { kr: 'https://www.youtube.com/watch?v=5YHcPv98mOo', us: '' },
+        thickness: '2.3',
+        strategy: 'OFF+',
+        control: 78,
+        hardness: '52.5',
+    },
 ];
 
 const xiomRubbers = [
@@ -477,6 +533,7 @@ const xiomRubbers = [
         y: 61,
         label: 'C55',
         shape: 'hybrid',
+        bestSeller: true,
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: '', us: '' },
         hardness: '55',
@@ -591,6 +648,7 @@ const xiomRubbers = [
         y: 61,
         label: 'Omega7 Pro',
         shape: 'hybrid',
+        bestSeller: true,
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: '', us: '' },
         hardness: '47.5',
