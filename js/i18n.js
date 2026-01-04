@@ -33,7 +33,18 @@ const I18N = {
         iconCoupang: 'Coupang',
         iconAmazon: 'Amazon',
         iconLink: 'Link',
-        iconYouTube: 'YouTube'
+        iconYouTube: 'YouTube',
+
+        slotA: 'Rubber 1',
+        slotB: 'Rubber 2',
+        slotComparison: 'Comparison',
+        compareHint: 'Click a point to set Rubber 1. Shift+click to set Rubber 2.',
+        compareInstrTitle: 'Compare:',
+        compareInstrFirst: 'Rubber 1 → Click',
+        compareInstrSecond: 'Rubber 2 → Shift + Click',
+        loading: 'Loading…',
+        noInfoYet: 'No info yet.',
+        noComparisonYet: 'No comparison yet.'
     },
     ko: {
         pageTitle: '탁구 러버 차트',
@@ -64,7 +75,18 @@ const I18N = {
         iconCoupang: '쿠팡',
         iconAmazon: '아마존',
         iconLink: '링크',
-        iconYouTube: '유튜브'
+        iconYouTube: '유튜브',
+
+        slotA: '러버 1',
+        slotB: '러버 2',
+        slotComparison: '비교',
+        compareHint: '차트에서 클릭하면 러버 1, Shift+클릭하면 러버 2로 선택됩니다.',
+        compareInstrTitle: '비교:',
+        compareInstrFirst: '첫 번째 러버 → Click',
+        compareInstrSecond: '두 번째 러버 → Shift + Click',
+        loading: '불러오는 중…',
+        noInfoYet: '정보가 아직 없습니다.',
+        noComparisonYet: '비교 정보가 아직 없습니다.'
     }
 };
 

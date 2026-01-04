@@ -118,7 +118,8 @@ body {
 }
 .chart-container {
     position: relative;
-    height: 80vh;
+    height: auto;
+    min-height: 80vh;
     width: 80vw;
     background:
         linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
@@ -183,10 +184,10 @@ body {
         drop-shadow(0 0 10px rgba(124, 211, 255, 0.35));
 }
 .lang-switch {
-    position: fixed;
+    position: absolute;
     top: 14px;
     right: 14px;
-    z-index: 20;
+    z-index: 6;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -244,16 +245,54 @@ body {
 }
 .canvas-wrap {
     position: relative;
-    flex: 1;
+    flex: 0 0 auto;
+    height: clamp(420px, 60vh, 680px);
     /* Important for flexbox: allow the chart area to shrink instead of overflowing
        (otherwise the bottom axis can get clipped when the container has overflow:hidden). */
     min-height: 0;
 }
 
+/* --- Compare instruction (inside chart container, top-left area) --- */
+.compare-instruction {
+    position: relative;
+    z-index: 1;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(10, 14, 28, 0.62);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(255,255,255,0.78);
+    font-size: 12px;
+    line-height: 1.25;
+    pointer-events: none;
+    max-width: min(360px, calc(100% - 16px));
+    margin: 0 auto 0 0;
+}
+.compare-instruction__title {
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    color: rgba(255,255,255,0.86);
+    margin-bottom: 6px;
+}
+.compare-instruction__item {
+    display: flex;
+    gap: 8px;
+    white-space: nowrap;
+}
+.compare-instruction__item + .compare-instruction__item {
+    margin-top: 4px;
+}
+.compare-instruction__bullet {
+    flex: 0 0 auto;
+    color: rgba(255,255,255,0.70);
+}
+
 /* --- Rubber details panel (below chart) --- */
 .rubber-details {
-    width: 80vw;
-    max-width: 980px;
+    width: 100%;
+    max-width: none;
     background:
         radial-gradient(700px 160px at 18% 0%, rgba(124, 211, 255, 0.10), transparent 65%),
         radial-gradient(700px 160px at 82% 0%, rgba(233, 65, 145, 0.08), transparent 65%),
@@ -264,6 +303,70 @@ body {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     overflow: hidden;
+}
+
+/* --- Compare layout (A / B + Comparison) --- */
+.rubber-compare .rubber-details__head {
+    gap: 10px;
+}
+.rubber-compare__name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rubber-compare__name--a {
+    color: rgba(124, 211, 255, 0.96);
+}
+.rubber-compare__name--b {
+    color: rgba(239, 68, 68, 0.96);
+}
+
+.rubber-compare__comparison-head {
+    justify-content: flex-start;
+}
+.rubber-compare__compare-title {
+    display: inline-flex;
+    gap: 8px;
+    align-items: baseline;
+}
+.rubber-compare__vs {
+    color: rgba(255,255,255,0.72);
+    font-weight: 800;
+}
+.rubber-compare__slot {
+    flex: 0 0 auto;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+}
+.rubber-compare__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.rubber-compare__card {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background: rgba(0,0,0,0.10);
+}
+.rubber-compare__comparison {
+    margin-top: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background: rgba(0,0,0,0.10);
+}
+
+@media (max-width: 860px) {
+    .rubber-compare__grid {
+        grid-template-columns: 1fr;
+    }
 }
 .rubber-details__head {
     display: flex;
@@ -278,6 +381,14 @@ body {
     letter-spacing: 0.25px;
     color: rgba(255,255,255,0.96);
     text-shadow: 0 1px 12px rgba(0,0,0,0.55);
+}
+
+/* Ensure Rubber 1/2 name colors override the generic title color */
+.rubber-details__title.rubber-compare__name--a {
+    color: rgba(124, 211, 255, 0.96);
+}
+.rubber-details__title.rubber-compare__name--b {
+    color: rgba(239, 68, 68, 0.96);
 }
 .rubber-details__body {
     margin: 0;

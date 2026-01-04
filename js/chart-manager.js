@@ -13,27 +13,59 @@ class ChartManager {
         this.urlManager = urlManager;
         this.tooltipManager = tooltipManager;
         this.currentBrand = BUTTERFLY;
+        // Set A uses the existing selection semantics.
         this.selectedRubber = null;
+        // Set B is selected via Shift+Click.
+        this.selectedRubberB = null;
         this.chart = null;
-        this._rubberDetailsReqId = 0;
+        this._rubberDetailsReqIdA = 0;
+        this._rubberDetailsReqIdB = 0;
+        this._rubberCompareReqId = 0;
         this._rubberDetailsEls = null;
     }
 
     getRubberDetailsEls() {
         if (this._rubberDetailsEls) return this._rubberDetailsEls;
-        const container = document.getElementById('rubberDetails');
-        const title = document.getElementById('rubberDetailsTitle');
-        const body = document.getElementById('rubberDetailsBody');
-        if (!container || !title || !body) return null;
-        this._rubberDetailsEls = { container, title, body };
+        const container = document.getElementById('rubberCompare');
+
+        const setA = document.getElementById('rubberSetA');
+        const titleA = document.getElementById('rubberNameA');
+        const bodyA = document.getElementById('rubberDetailsBodyA');
+
+        const setB = document.getElementById('rubberSetB');
+        const titleB = document.getElementById('rubberNameB');
+        const bodyB = document.getElementById('rubberDetailsBodyB');
+
+        const compare = document.getElementById('rubberComparison');
+        const compareTitle = document.getElementById('rubberComparisonTitle');
+        const compareBody = document.getElementById('rubberComparisonBody');
+
+        if (!container || !setA || !titleA || !bodyA || !setB || !titleB || !bodyB || !compare || !compareTitle || !compareBody) {
+            return null;
+        }
+
+        this._rubberDetailsEls = {
+            container,
+            setA, titleA, bodyA,
+            setB, titleB, bodyB,
+            compare, compareTitle, compareBody
+        };
         return this._rubberDetailsEls;
     }
 
     clearRubberDetails() {
         const els = this.getRubberDetailsEls();
         if (!els) return;
-        els.title.textContent = '';
-        els.body.innerHTML = '';
+        els.titleA.textContent = '';
+        els.bodyA.innerHTML = '';
+        els.titleB.textContent = '';
+        els.bodyB.innerHTML = '';
+        els.setB.hidden = true;
+
+        els.compareTitle.textContent = '';
+        els.compareBody.innerHTML = '';
+        els.compare.hidden = true;
+
         els.container.hidden = true;
     }
 
@@ -42,7 +74,10 @@ class ChartManager {
         const clearDetails = options.clearDetails !== false;
 
         this.selectedRubber = null;
-        this._rubberDetailsReqId++; // invalidate any in-flight details load
+        this.selectedRubberB = null;
+        this._rubberDetailsReqIdA++; // invalidate any in-flight details load
+        this._rubberDetailsReqIdB++;
+        this._rubberCompareReqId++;
 
         try {
             this.tooltipManager?.setForcedPosition?.(null);
@@ -66,20 +101,55 @@ class ChartManager {
         }
     }
 
-    async loadRubberDetails(label) {
+    /**
+     * Clears only chart highlight/tooltip state (active elements + forced tooltip position),
+     * while keeping the selected rubbers and details panel intact.
+     * Useful when switching brand tabs but wanting to keep descriptions visible.
+     */
+    clearChartFocus() {
+        try {
+            this.tooltipManager?.setForcedPosition?.(null);
+        } catch {
+            // ignore
+        }
+
+        try {
+            this.chart?.setActiveElements?.([]);
+            this.chart?.tooltip?.setActiveElements?.([], { x: 0, y: 0 });
+        } catch {
+            // ignore
+        }
+
+        try {
+            this.chart?.update?.();
+        } catch {
+            // ignore
+        }
+    }
+
+    async loadRubberDetails(label, slot) {
+        const targetSlot = slot === 'B' ? 'B' : 'A';
         const els = this.getRubberDetailsEls();
         if (!els) return;
 
         const rawLabel = String(label || '').trim();
+        const titleEl = targetSlot === 'B' ? els.titleB : els.titleA;
+        const bodyEl = targetSlot === 'B' ? els.bodyB : els.bodyA;
+        const reqId = targetSlot === 'B' ? ++this._rubberDetailsReqIdB : ++this._rubberDetailsReqIdA;
+
+        els.container.hidden = false;
+        if (targetSlot === 'B') els.setB.hidden = false;
+
         if (!rawLabel) {
-            this.clearRubberDetails();
+            titleEl.textContent = '';
+            bodyEl.innerHTML = '';
+            if (targetSlot === 'B') els.setB.hidden = true;
+            this.updateComparisonPanel();
             return;
         }
 
-        const reqId = ++this._rubberDetailsReqId;
-        els.container.hidden = false;
-        els.title.textContent = this.i18nManager.localizeRubberName(rawLabel);
-        els.body.textContent = 'Loading…';
+        titleEl.textContent = this.i18nManager.localizeRubberName(rawLabel);
+        bodyEl.textContent = this.i18nManager.t('loading');
 
         const lang = (this.i18nManager?.getLang?.() || 'en').toLowerCase();
         const safeLang = (lang === 'ko' || lang === 'en') ? lang : 'en';
@@ -88,46 +158,180 @@ class ChartManager {
         const fallbackUrl = `rubbers/${safeLang === 'ko' ? 'en' : 'ko'}/${baseName}`;
         try {
             let res = await fetch(primaryUrl, { cache: 'no-store' });
-            if (reqId !== this._rubberDetailsReqId) return; // stale
+            const stillValid = targetSlot === 'B'
+                ? (reqId === this._rubberDetailsReqIdB)
+                : (reqId === this._rubberDetailsReqIdA);
+            if (!stillValid) return; // stale
             if (!res.ok && res.status === 404) {
                 // If a translation doesn't exist yet, try the other language folder.
                 res = await fetch(fallbackUrl, { cache: 'no-store' });
-                if (reqId !== this._rubberDetailsReqId) return; // stale
+                const stillValid2 = targetSlot === 'B'
+                    ? (reqId === this._rubberDetailsReqIdB)
+                    : (reqId === this._rubberDetailsReqIdA);
+                if (!stillValid2) return; // stale
             }
 
             if (!res.ok) {
                 if (res.status === 404) {
-                    els.body.textContent = 'No info yet.';
+                    bodyEl.textContent = this.i18nManager.t('noInfoYet');
                 } else {
-                    els.body.textContent = `Failed to load info (${res.status}).`;
+                    bodyEl.textContent = `Failed to load info (${res.status}).`;
+                }
+                this.updateComparisonPanel();
+                return;
+            }
+
+            const text = await res.text();
+            const stillValid3 = targetSlot === 'B'
+                ? (reqId === this._rubberDetailsReqIdB)
+                : (reqId === this._rubberDetailsReqIdA);
+            if (!stillValid3) return; // stale
+            const md = (text || '').trim();
+            if (!md) {
+                bodyEl.textContent = this.i18nManager.t('noInfoYet');
+                this.updateComparisonPanel();
+                return;
+            }
+            bodyEl.innerHTML = renderMarkdown(md);
+            this.updateComparisonPanel();
+        } catch {
+            const stillValid4 = targetSlot === 'B'
+                ? (reqId === this._rubberDetailsReqIdB)
+                : (reqId === this._rubberDetailsReqIdA);
+            if (!stillValid4) return; // stale
+            bodyEl.textContent = 'Failed to load info.';
+            this.updateComparisonPanel();
+        }
+    }
+
+    refreshRubberDetailsForCurrentSelection() {
+        const selA = this.selectedRubber;
+        try {
+            if (selA && selA.datasetIndex != null && selA.dataIndex != null) {
+                const dsA = this.chart?.data?.datasets?.[selA.datasetIndex];
+                const pointDataA = dsA?.data?.[selA.dataIndex] || {};
+                void this.loadRubberDetails(pointDataA?.label, 'A');
+            }
+
+            const selB = this.selectedRubberB;
+            if (selB && selB.datasetIndex != null && selB.dataIndex != null) {
+                const dsB = this.chart?.data?.datasets?.[selB.datasetIndex];
+                const pointDataB = dsB?.data?.[selB.dataIndex] || {};
+                void this.loadRubberDetails(pointDataB?.label, 'B');
+            } else {
+                // Ensure Set B is hidden if not selected
+                const els = this.getRubberDetailsEls();
+                if (els) {
+                    els.titleB.textContent = '';
+                    els.bodyB.innerHTML = '';
+                    els.setB.hidden = true;
+                }
+                this.updateComparisonPanel();
+            }
+        } catch {
+            // ignore
+        }
+    }
+
+    async loadComparisonDetails(labelA, labelB) {
+        const els = this.getRubberDetailsEls();
+        if (!els) return;
+
+        const a = String(labelA || '').trim();
+        const b = String(labelB || '').trim();
+        if (!a || !b) {
+            els.compare.hidden = true;
+            els.compareTitle.textContent = '';
+            els.compareBody.innerHTML = '';
+            return;
+        }
+
+        // Sort alphabetically to match the comparison file convention.
+        const sorted = [a, b].sort((x, y) => String(x).localeCompare(String(y), 'en', { sensitivity: 'base' }));
+        const fileBase = `${encodeURIComponent(sorted[0])}_${encodeURIComponent(sorted[1])}.md`;
+
+        const reqId = ++this._rubberCompareReqId;
+        els.compare.hidden = false;
+        // Render title with the same colors as the chart selections (blue/red).
+        try {
+            while (els.compareTitle.firstChild) els.compareTitle.removeChild(els.compareTitle.firstChild);
+            const aSpan = document.createElement('span');
+            aSpan.className = 'rubber-compare__name rubber-compare__name--a';
+            aSpan.textContent = this.i18nManager.localizeRubberName(a);
+            const vsSpan = document.createElement('span');
+            vsSpan.className = 'rubber-compare__vs';
+            vsSpan.textContent = 'vs';
+            const bSpan = document.createElement('span');
+            bSpan.className = 'rubber-compare__name rubber-compare__name--b';
+            bSpan.textContent = this.i18nManager.localizeRubberName(b);
+            els.compareTitle.appendChild(aSpan);
+            els.compareTitle.appendChild(vsSpan);
+            els.compareTitle.appendChild(bSpan);
+        } catch {
+            els.compareTitle.textContent = `${this.i18nManager.localizeRubberName(a)} vs ${this.i18nManager.localizeRubberName(b)}`;
+        }
+        els.compareBody.textContent = this.i18nManager.t('loading');
+
+        const lang = (this.i18nManager?.getLang?.() || 'en').toLowerCase();
+        const safeLang = (lang === 'ko' || lang === 'en') ? lang : 'en';
+        const primaryUrl = `rubbers/comparison/${safeLang}/${fileBase}`;
+        const fallbackUrl = `rubbers/comparison/${safeLang === 'ko' ? 'en' : 'ko'}/${fileBase}`;
+
+        try {
+            let res = await fetch(primaryUrl, { cache: 'no-store' });
+            if (reqId !== this._rubberCompareReqId) return; // stale
+            if (!res.ok && res.status === 404) {
+                res = await fetch(fallbackUrl, { cache: 'no-store' });
+                if (reqId !== this._rubberCompareReqId) return; // stale
+            }
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    els.compareBody.textContent = this.i18nManager.t('noComparisonYet');
+                } else {
+                    els.compareBody.textContent = `Failed to load comparison (${res.status}).`;
                 }
                 return;
             }
 
             const text = await res.text();
-            if (reqId !== this._rubberDetailsReqId) return; // stale
+            if (reqId !== this._rubberCompareReqId) return; // stale
             const md = (text || '').trim();
             if (!md) {
-                els.body.textContent = 'No info yet.';
+                els.compareBody.textContent = this.i18nManager.t('noComparisonYet');
                 return;
             }
-            els.body.innerHTML = renderMarkdown(md);
+            els.compareBody.innerHTML = renderMarkdown(md);
         } catch {
-            if (reqId !== this._rubberDetailsReqId) return; // stale
-            els.body.textContent = 'Failed to load info.';
+            if (reqId !== this._rubberCompareReqId) return; // stale
+            els.compareBody.textContent = 'Failed to load comparison.';
         }
     }
 
-    refreshRubberDetailsForCurrentSelection() {
-        const sel = this.selectedRubber;
-        if (!sel || sel.datasetIndex == null || sel.dataIndex == null) return;
+    updateComparisonPanel() {
         try {
-            const ds = this.chart?.data?.datasets?.[sel.datasetIndex];
-            const pointData = ds?.data?.[sel.dataIndex] || {};
-            void this.loadRubberDetails(pointData?.label);
+            const a = this.getSelectedLabel('A');
+            const b = this.getSelectedLabel('B');
+            if (a && b) void this.loadComparisonDetails(a, b);
+            else {
+                const els = this.getRubberDetailsEls();
+                if (els) {
+                    els.compare.hidden = true;
+                    els.compareTitle.textContent = '';
+                    els.compareBody.innerHTML = '';
+                }
+            }
         } catch {
             // ignore
         }
+    }
+
+    getSelectedLabel(slot) {
+        const sel = slot === 'B' ? this.selectedRubberB : this.selectedRubber;
+        if (!sel || sel.datasetIndex == null || sel.dataIndex == null) return '';
+        const ds = this.chart?.data?.datasets?.[sel.datasetIndex];
+        const pointData = ds?.data?.[sel.dataIndex] || {};
+        return String(pointData?.label || '').trim();
     }
 
     createDatasets() {
@@ -180,33 +384,8 @@ class ChartManager {
                 shapeLegend.style.right = `${right}px`;
             }
         };
-
-        const selectedPointHaloPlugin = {
-            id: 'selectedPointHaloPlugin',
-            afterDatasetsDraw: (chart) => {
-                if (!this.selectedRubber) return;
-                const { datasetIndex, dataIndex } = this.selectedRubber || {};
-                if (datasetIndex == null || dataIndex == null) return;
-
-                const meta = chart.getDatasetMeta(datasetIndex);
-                const el = meta?.data?.[dataIndex];
-                if (!el) return;
-
-                const { x, y } = el.getProps(['x', 'y'], true);
-                const ctx = chart.ctx;
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(x, y, 12, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(124, 211, 255, 0.95)';
-                ctx.lineWidth = 3;
-                ctx.shadowColor = 'rgba(124, 211, 255, 0.35)';
-                ctx.shadowBlur = 10;
-                ctx.stroke();
-                ctx.restore();
-            }
-        };
-
-        return [overlayAlignPlugin, selectedPointHaloPlugin];
+        // No circle highlight/halo: we highlight selections via label color instead.
+        return [overlayAlignPlugin];
     }
 
     createChart() {
@@ -282,27 +461,44 @@ class ChartManager {
                         anchor: 'center',
                         offset: 8,
                         color: (ctx) => {
-                            const isSelected = !!this.selectedRubber
+                            const isSelectedA = !!this.selectedRubber
                                 && ctx?.datasetIndex === this.selectedRubber.datasetIndex
                                 && ctx?.dataIndex === this.selectedRubber.dataIndex;
-                            return isSelected ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.82)';
+                            const isSelectedB = !!this.selectedRubberB
+                                && ctx?.datasetIndex === this.selectedRubberB.datasetIndex
+                                && ctx?.dataIndex === this.selectedRubberB.dataIndex;
+                            if (isSelectedA) return 'rgba(124, 211, 255, 0.98)'; // Rubber 1
+                            if (isSelectedB) return 'rgba(239, 68, 68, 0.98)'; // Rubber 2
+                            return 'rgba(255,255,255,0.82)';
                         },
                         font: (ctx) => {
-                            const isSelected = !!this.selectedRubber
+                            const isSelectedA = !!this.selectedRubber
                                 && ctx?.datasetIndex === this.selectedRubber.datasetIndex
                                 && ctx?.dataIndex === this.selectedRubber.dataIndex;
+                            const isSelectedB = !!this.selectedRubberB
+                                && ctx?.datasetIndex === this.selectedRubberB.datasetIndex
+                                && ctx?.dataIndex === this.selectedRubberB.dataIndex;
+                            const isSelected = isSelectedA || isSelectedB;
                             return { size: isSelected ? 12 : 11, weight: isSelected ? 'bold' : 'normal' };
                         },
                         textStrokeColor: (ctx) => {
-                            const isSelected = !!this.selectedRubber
+                            const isSelectedA = !!this.selectedRubber
                                 && ctx?.datasetIndex === this.selectedRubber.datasetIndex
                                 && ctx?.dataIndex === this.selectedRubber.dataIndex;
+                            const isSelectedB = !!this.selectedRubberB
+                                && ctx?.datasetIndex === this.selectedRubberB.datasetIndex
+                                && ctx?.dataIndex === this.selectedRubberB.dataIndex;
+                            const isSelected = isSelectedA || isSelectedB;
                             return isSelected ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0)';
                         },
                         textStrokeWidth: (ctx) => {
-                            const isSelected = !!this.selectedRubber
+                            const isSelectedA = !!this.selectedRubber
                                 && ctx?.datasetIndex === this.selectedRubber.datasetIndex
                                 && ctx?.dataIndex === this.selectedRubber.dataIndex;
+                            const isSelectedB = !!this.selectedRubberB
+                                && ctx?.datasetIndex === this.selectedRubberB.datasetIndex
+                                && ctx?.dataIndex === this.selectedRubberB.dataIndex;
+                            const isSelected = isSelectedA || isSelectedB;
                             return isSelected ? 3 : 0;
                         },
                         textAlign: 'left',
@@ -318,9 +514,17 @@ class ChartManager {
                         const dataIndex = activeElements[0].index;
                         const ds = chart.data.datasets[datasetIndex];
                         const pointData = ds.data[dataIndex];
+                        const isShift = !!(evt?.native?.shiftKey || evt?.shiftKey);
+                        const slot = (isShift && this.selectedRubber) ? 'B' : 'A';
 
-                        this.urlManager.setRubberParam(pointData?.label);
-                        this.openRubberInfo({ brand: ds.label, datasetIndex, dataIndex });
+                        if (slot === 'A') {
+                            this.urlManager.setRubber1Param?.(pointData?.label);
+                            // Back-compat: if UrlManager doesn't have rubber1 support yet, fall back.
+                            if (!this.urlManager.setRubber1Param) this.urlManager.setRubberParam(pointData?.label);
+                        } else {
+                            this.urlManager.setRubber2Param?.(pointData?.label);
+                        }
+                        this.openRubberInfo({ brand: ds.label, datasetIndex, dataIndex }, { slot });
                     }
                 }
             },
@@ -373,20 +577,60 @@ class ChartManager {
 
     openRubberInfo(match, opts) {
         if (!match) return false;
-        this.selectedRubber = { datasetIndex: match.datasetIndex, dataIndex: match.dataIndex };
-        this.setActiveBrand(match.brand);
+        const slot = (opts && opts.slot === 'B') ? 'B' : 'A';
+        const noBrandSwitch = !!(opts && opts.noBrandSwitch);
+        const nextSel = { datasetIndex: match.datasetIndex, dataIndex: match.dataIndex };
+
+        // Apply the selection to Set A or Set B.
+        if (slot === 'B') {
+            this.selectedRubberB = nextSel;
+        } else {
+            this.selectedRubber = nextSel;
+        }
+
+        // Avoid duplicate A/B selections.
+        try {
+            const a = this.getSelectedLabel('A');
+            const b = this.getSelectedLabel('B');
+            if (a && b && a.toLowerCase() === b.toLowerCase()) {
+                this.selectedRubberB = null;
+                try {
+                    this.urlManager?.deleteParam?.('rubber2');
+                } catch {
+                    // ignore
+                }
+                const els = this.getRubberDetailsEls();
+                if (els) {
+                    els.titleB.textContent = '';
+                    els.bodyB.innerHTML = '';
+                    els.setB.hidden = true;
+                }
+            }
+        } catch {
+            // ignore
+        }
+
+        if (!noBrandSwitch) this.setActiveBrand(match.brand);
 
         const meta = this.chart.getDatasetMeta(match.datasetIndex);
         const el = meta?.data?.[match.dataIndex];
-        if (!el) return false;
+        // If we aren't switching brands (e.g. restoring Rubber 2 from URL),
+        // the dataset may be hidden; still allow loading details without chart focus.
+        if (!el && !noBrandSwitch) return false;
 
         // Update the rubber details panel (loaded from /rubbers/<lang>/*.md).
         try {
             const ds = this.chart.data.datasets[match.datasetIndex];
             const pointData = ds?.data?.[match.dataIndex] || {};
-            void this.loadRubberDetails(pointData?.label);
+            void this.loadRubberDetails(pointData?.label, slot);
         } catch {
             // ignore
+        }
+
+        if (noBrandSwitch || !el) {
+            this.updateComparisonPanel();
+            try { this.chart?.update?.(); } catch { /* ignore */ }
+            return true;
         }
 
         const pos = el.getProps(['x', 'y'], true);
@@ -419,6 +663,9 @@ class ChartManager {
         this.chart.setActiveElements(active);
         this.chart.tooltip.setActiveElements(active, { x: pos.x, y: pos.y });
         this.chart.update();
+
+        // Trigger comparison load if both are selected.
+        this.updateComparisonPanel();
         return true;
     }
 

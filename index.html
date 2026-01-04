@@ -12,16 +12,16 @@
 </head>
 <body>
 
-<div class="lang-switch" aria-label="Country">
-    <span class="select-wrap">
-        <select id="countrySelect" aria-label="Country">
-            <option value="kr">🇰🇷 Korea</option>
-            <option value="us">🇺🇸 USA</option>
-        </select>
-    </span>
-</div>
-
 <div class="chart-container">
+    <div class="lang-switch" aria-label="Country">
+        <span class="select-wrap">
+            <select id="countrySelect" aria-label="Country">
+                <option value="kr">🇰🇷 Korea</option>
+                <option value="us">🇺🇸 USA</option>
+            </select>
+        </span>
+    </div>
+
     <div class="tabs" role="tablist" aria-label="Brand" id="brandTabs">
         <button class="tab active" type="button" role="tab" aria-selected="true" data-brand="Butterfly">
             <img src="images/butterfly.ico" alt="" aria-hidden="true" />
@@ -36,6 +36,19 @@
             <span data-i18n="brandXiom">XIOM</span>
         </button>
     </div>
+
+    <div class="compare-instruction" aria-hidden="true">
+        <div class="compare-instruction__title" data-i18n="compareInstrTitle">Compare:</div>
+        <div class="compare-instruction__item">
+            <span class="compare-instruction__bullet">•</span>
+            <span data-i18n="compareInstrFirst">Rubber 1 → Click</span>
+        </div>
+        <div class="compare-instruction__item">
+            <span class="compare-instruction__bullet">•</span>
+            <span data-i18n="compareInstrSecond">Rubber 2 → Shift + Click</span>
+        </div>
+    </div>
+
     <div class="canvas-wrap">
         <canvas id="rubberChart"></canvas>
         <div class="hardness-legend" aria-hidden="true">
@@ -82,15 +95,33 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Rubber details panel (loaded from /rubbers/<lang>/*.md) -->
-<section id="rubberDetails" class="rubber-details" aria-live="polite" hidden>
-    <div class="rubber-details__head">
-        <div id="rubberDetailsTitle" class="rubber-details__title"></div>
-    </div>
-    <div id="rubberDetailsBody" class="rubber-details__body"></div>
-</section>
+    <!-- Rubber compare panel (loaded from /rubbers/<lang>/*.md and /rubbers/comparison/<lang>/*.md) -->
+    <section id="rubberCompare" class="rubber-details rubber-compare" aria-live="polite" hidden>
+        <div class="rubber-compare__grid">
+            <article id="rubberSetA" class="rubber-compare__card">
+                <div class="rubber-details__head">
+                    <div id="rubberNameA" class="rubber-details__title rubber-compare__name rubber-compare__name--a"></div>
+                </div>
+                <div id="rubberDetailsBodyA" class="rubber-details__body"></div>
+            </article>
+
+            <article id="rubberSetB" class="rubber-compare__card" hidden>
+                <div class="rubber-details__head">
+                    <div id="rubberNameB" class="rubber-details__title rubber-compare__name rubber-compare__name--b"></div>
+                </div>
+                <div id="rubberDetailsBodyB" class="rubber-details__body"></div>
+            </article>
+        </div>
+
+        <article id="rubberComparison" class="rubber-compare__comparison" hidden>
+            <div class="rubber-details__head rubber-compare__comparison-head">
+                <div id="rubberComparisonTitle" class="rubber-details__title rubber-compare__compare-title"></div>
+            </div>
+            <div id="rubberComparisonBody" class="rubber-details__body"></div>
+        </article>
+    </section>
+</div>
 
 <script type="module" src="js/main.js"></script>
 

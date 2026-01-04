@@ -24,7 +24,8 @@ const chart = chartManager.createChart();
 // Initialize from URL and localStorage
 const urlParams = urlManager.getParams();
 const urlCompanyOrBrand = urlParams.get('company') || urlParams.get('brand') || '';
-const urlRubber = (urlParams.get('rubber') || '').trim();
+const urlRubber1 = (urlParams.get('rubber1') || urlParams.get('rubber') || '').trim();
+const urlRubber2 = (urlParams.get('rubber2') || '').trim();
 const storedCompanyOrBrand = window.localStorage.getItem('company') || window.localStorage.getItem('brand') || '';
 const initialBrand = urlManager.normalizeBrandParam(urlCompanyOrBrand) || 
                      urlManager.normalizeBrandParam(storedCompanyOrBrand) || 
@@ -44,6 +45,8 @@ window.localStorage.setItem('company', initialBrand);
 if (urlCountry) urlManager.setParams({ country: i18nManager.getCountry() });
 if (urlCompanyOrBrand || urlParams.has('brand')) urlManager.setParams({ company: initialBrand });
 if (urlParams.has('brand')) urlManager.deleteParam('brand');
+// Back-compat: if only `rubber` is present, mirror it into `rubber1` for compare links.
+if (urlParams.has('rubber') && !urlParams.has('rubber1')) urlManager.setParams({ rubber1: (urlParams.get('rubber') || '').trim() });
 
 // Set initial brand
 chartManager.setActiveBrand(initialBrand);
@@ -71,20 +74,28 @@ document.querySelectorAll('.tab[data-brand]').forEach((btn) => {
         const brand = btn.getAttribute('data-brand');
         if (brand && BRAND_AXIS_RANGES[brand]) {
             chartManager.setActiveBrand(brand);
-            chartManager.clearRubberSelection({ clearDetails: true });
+            // Keep selected rubber descriptions (Set A/B) when switching company,
+            // but clear any active chart tooltip/highlight to avoid stale positioning.
+            chartManager.clearChartFocus();
             window.localStorage.setItem('company', brand);
             urlManager.setParams({ company: chartManager.getCurrentBrand() });
-            // When switching company/brand, clear any previously selected rubber + YouTube link from the URL.
-            urlManager.deleteParam('rubber');
-            urlManager.deleteParam('youtube');
+            // NOTE: we intentionally keep `rubber` (and `youtube`) params so the selected rubber description remains visible.
         }
     });
 });
 
 // Handle initial rubber from URL
-if (urlRubber) {
-    const match = chartManager.findRubberByLabel(urlRubber);
-    if (match) chartManager.openRubberInfo(match, { preferLabelPosition: true });
+if (urlRubber1) {
+    const match = chartManager.findRubberByLabel(urlRubber1);
+    if (match) chartManager.openRubberInfo(match, { preferLabelPosition: true, slot: 'A' });
+}
+
+if (urlRubber2) {
+    const match2 = chartManager.findRubberByLabel(urlRubber2);
+    if (match2) {
+        // Don't switch chart brand on load for Rubber 2: keep the chart driven by the active tab / Rubber 1.
+        chartManager.openRubberInfo(match2, { slot: 'B', noBrandSwitch: true });
+    }
 }
 
 // Handle initial YouTube video from URL
