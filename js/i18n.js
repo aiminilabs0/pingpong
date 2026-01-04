@@ -5,7 +5,7 @@
 
 const I18N = {
     en: {
-        pageTitle: 'Pingpong Rubber Chart',
+        pageTitle: 'AI PingPong',
         ariaCountry: 'Country',
         countryKorea: 'Korea',
         countryUsa: 'USA',
@@ -45,7 +45,7 @@ const I18N = {
         noComparisonYet: 'No comparison yet.'
     },
     ko: {
-        pageTitle: '탁구 러버 차트',
+        pageTitle: 'AI PingPong',
         ariaCountry: '국가',
         countryKorea: '한국',
         countryUsa: 'USA',
@@ -170,6 +170,13 @@ class I18nManager {
         document.querySelectorAll('[data-i18n]').forEach((el) => {
             const key = el.getAttribute('data-i18n');
             if (!key) return;
+
+            // Special-case: we want per-token coloring ("Rubber 1/2") which requires HTML spans.
+            if (key === 'compareInstrLine') {
+                el.innerHTML = this.getCompareInstrLineHtml();
+                return;
+            }
+
             el.textContent = this.t(key);
         });
 
@@ -216,6 +223,13 @@ class I18nManager {
 
     getLang() {
         return this.currentLang;
+    }
+
+    getCompareInstrLineHtml() {
+        if (this.currentLang === 'ko') {
+            return '💡 <span class="compare-instruction__slot compare-instruction__slot--a">러버1</span> → Click, <span class="compare-instruction__slot compare-instruction__slot--b">러버2</span> → Shift + Click';
+        }
+        return '💡 <span class="compare-instruction__slot compare-instruction__slot--a">Rubber 1</span> → Click, <span class="compare-instruction__slot compare-instruction__slot--b">Rubber 2</span> → Shift + Click';
     }
 }
 

@@ -275,6 +275,15 @@ body {
     display: inline-block;
     white-space: nowrap;
 }
+.compare-instruction__slot {
+    font-weight: 800;
+}
+.compare-instruction__slot--a {
+    color: rgba(124, 211, 255, 0.96);
+}
+.compare-instruction__slot--b {
+    color: rgba(239, 68, 68, 0.96);
+}
 
 /* --- Rubber details panel (below chart) --- */
 .rubber-details {
