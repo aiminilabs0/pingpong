@@ -623,7 +623,7 @@ const xiomRubbers = [
         x: 64,
         y: 61,
         label: 'Omega7 Pro',
-        shape: 'hybrid',
+        shape: 'normal',
         bestSeller: true,
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: '', us: '' },
