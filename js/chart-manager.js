@@ -5,6 +5,8 @@
 import { BUTTERFLY, TIBHAR, XIOM, BRAND_AXIS_RANGES } from './constants.js';
 import { colorForRubberPoint, mapPointStyle } from './color-utils.js';
 import { renderMarkdown } from './markdown.js';
+import { maybeEmbedYouTubeClick } from './youtube-embed.js';
+import { makeIconLink, productUrlForPoint, shopIconMetaForUrl, youtubeUrlForPoint } from './tooltip.js';
 
 // Global scale for anything drawn inside the Chart.js canvas (fonts, point radius, etc).
 // Increased by +20% twice total (1.2 * 1.2 = 1.44) per UI sizing request.
@@ -45,24 +47,26 @@ class ChartManager {
 
         const setA = document.getElementById('rubberSetA');
         const titleA = document.getElementById('rubberNameA');
+        const actionsA = document.getElementById('rubberActionsA');
         const bodyA = document.getElementById('rubberDetailsBodyA');
 
         const setB = document.getElementById('rubberSetB');
         const titleB = document.getElementById('rubberNameB');
+        const actionsB = document.getElementById('rubberActionsB');
         const bodyB = document.getElementById('rubberDetailsBodyB');
 
         const compare = document.getElementById('rubberComparison');
         const compareTitle = document.getElementById('rubberComparisonTitle');
         const compareBody = document.getElementById('rubberComparisonBody');
 
-        if (!container || !setA || !titleA || !bodyA || !setB || !titleB || !bodyB || !compare || !compareTitle || !compareBody) {
+        if (!container || !setA || !titleA || !actionsA || !bodyA || !setB || !titleB || !actionsB || !bodyB || !compare || !compareTitle || !compareBody) {
             return null;
         }
 
         this._rubberDetailsEls = {
             container,
-            setA, titleA, bodyA,
-            setB, titleB, bodyB,
+            setA, titleA, actionsA, bodyA,
+            setB, titleB, actionsB, bodyB,
             compare, compareTitle, compareBody
         };
         return this._rubberDetailsEls;
@@ -72,8 +76,12 @@ class ChartManager {
         const els = this.getRubberDetailsEls();
         if (!els) return;
         els.titleA.textContent = '';
+        try { while (els.actionsA.firstChild) els.actionsA.removeChild(els.actionsA.firstChild); } catch { /* ignore */ }
+        els.actionsA.hidden = true;
         els.bodyA.innerHTML = '';
         els.titleB.textContent = '';
+        try { while (els.actionsB.firstChild) els.actionsB.removeChild(els.actionsB.firstChild); } catch { /* ignore */ }
+        els.actionsB.hidden = true;
         els.bodyB.innerHTML = '';
         els.setB.hidden = true;
 
@@ -144,13 +152,83 @@ class ChartManager {
         }
     }
 
-    async loadRubberDetails(label, slot) {
+    _clearEl(el) {
+        try {
+            while (el && el.firstChild) el.removeChild(el.firstChild);
+        } catch {
+            // ignore
+        }
+    }
+
+    _renderRubberDetailsHeader(label, pointData, slot) {
+        const targetSlot = slot === 'B' ? 'B' : 'A';
+        const els = this.getRubberDetailsEls();
+        if (!els) return;
+
+        const titleEl = targetSlot === 'B' ? els.titleB : els.titleA;
+        const actionsEl = targetSlot === 'B' ? els.actionsB : els.actionsA;
+
+        const rawLabel = String(label || pointData?.label || '').trim();
+        if (!rawLabel) {
+            titleEl.textContent = '';
+            this._clearEl(actionsEl);
+            actionsEl.hidden = true;
+            return;
+        }
+
+        const localizedLabel = this.i18nManager.localizeRubberName(rawLabel);
+        const country = this.i18nManager.getCountry();
+        const product = productUrlForPoint(pointData || {}, country);
+        const youtube = youtubeUrlForPoint(pointData || {}, country);
+
+        // Title: link to product page when available (same behavior as the chart tooltip).
+        this._clearEl(titleEl);
+        if (product) {
+            const a = document.createElement('a');
+            a.href = product;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.className = 'rubber-details__title-link';
+            a.textContent = localizedLabel;
+            a.addEventListener('click', () => {
+                try { this.urlManager?.setRubberParam?.(rawLabel); } catch { /* ignore */ }
+            });
+            titleEl.appendChild(a);
+        } else {
+            titleEl.textContent = localizedLabel;
+        }
+
+        // Actions: shop + YouTube icons.
+        this._clearEl(actionsEl);
+        const shopMeta = shopIconMetaForUrl(product, country, this.i18nManager);
+        const aShop = shopMeta ? makeIconLink(shopMeta.src, shopMeta.alt, product) : null;
+        const aYt = makeIconLink('images/youtube.ico', this.i18nManager.t('iconYouTube'), youtube);
+
+        if (aShop) {
+            aShop.addEventListener('click', () => {
+                try { this.urlManager?.setRubberParam?.(rawLabel); } catch { /* ignore */ }
+            });
+            actionsEl.appendChild(aShop);
+        }
+
+        if (aYt) {
+            aYt.addEventListener('click', (e) => {
+                try { this.urlManager?.setRubberParam?.(rawLabel); } catch { /* ignore */ }
+                try { this.urlManager?.setYouTubeParam?.(youtube); } catch { /* ignore */ }
+                maybeEmbedYouTubeClick(e, youtube);
+            });
+            actionsEl.appendChild(aYt);
+        }
+
+        actionsEl.hidden = !(aShop || aYt);
+    }
+
+    async loadRubberDetails(label, slot, pointData) {
         const targetSlot = slot === 'B' ? 'B' : 'A';
         const els = this.getRubberDetailsEls();
         if (!els) return;
 
         const rawLabel = String(label || '').trim();
-        const titleEl = targetSlot === 'B' ? els.titleB : els.titleA;
         const bodyEl = targetSlot === 'B' ? els.bodyB : els.bodyA;
         const reqId = targetSlot === 'B' ? ++this._rubberDetailsReqIdB : ++this._rubberDetailsReqIdA;
 
@@ -158,14 +236,14 @@ class ChartManager {
         if (targetSlot === 'B') els.setB.hidden = false;
 
         if (!rawLabel) {
-            titleEl.textContent = '';
+            this._renderRubberDetailsHeader('', null, targetSlot);
             bodyEl.innerHTML = '';
             if (targetSlot === 'B') els.setB.hidden = true;
             this.updateComparisonPanel();
             return;
         }
 
-        titleEl.textContent = this.i18nManager.localizeRubberName(rawLabel);
+        this._renderRubberDetailsHeader(rawLabel, pointData, targetSlot);
         bodyEl.textContent = this.i18nManager.t('loading');
 
         const lang = (this.i18nManager?.getLang?.() || 'en').toLowerCase();
@@ -227,19 +305,21 @@ class ChartManager {
             if (selA && selA.datasetIndex != null && selA.dataIndex != null) {
                 const dsA = this.chart?.data?.datasets?.[selA.datasetIndex];
                 const pointDataA = dsA?.data?.[selA.dataIndex] || {};
-                void this.loadRubberDetails(pointDataA?.label, 'A');
+                void this.loadRubberDetails(pointDataA?.label, 'A', pointDataA);
             }
 
             const selB = this.selectedRubberB;
             if (selB && selB.datasetIndex != null && selB.dataIndex != null) {
                 const dsB = this.chart?.data?.datasets?.[selB.datasetIndex];
                 const pointDataB = dsB?.data?.[selB.dataIndex] || {};
-                void this.loadRubberDetails(pointDataB?.label, 'B');
+                void this.loadRubberDetails(pointDataB?.label, 'B', pointDataB);
             } else {
                 // Ensure Set B is hidden if not selected
                 const els = this.getRubberDetailsEls();
                 if (els) {
                     els.titleB.textContent = '';
+                    this._clearEl(els.actionsB);
+                    els.actionsB.hidden = true;
                     els.bodyB.innerHTML = '';
                     els.setB.hidden = true;
                 }
@@ -673,6 +753,8 @@ class ChartManager {
                 const els = this.getRubberDetailsEls();
                 if (els) {
                     els.titleB.textContent = '';
+                    this._clearEl(els.actionsB);
+                    els.actionsB.hidden = true;
                     els.bodyB.innerHTML = '';
                     els.setB.hidden = true;
                 }
@@ -693,7 +775,7 @@ class ChartManager {
         try {
             const ds = this.chart.data.datasets[match.datasetIndex];
             const pointData = ds?.data?.[match.dataIndex] || {};
-            void this.loadRubberDetails(pointData?.label, slot);
+            void this.loadRubberDetails(pointData?.label, slot, pointData);
         } catch {
             // ignore
         }

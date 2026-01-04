@@ -236,5 +236,11 @@ class TooltipManager {
     }
 }
 
-export { TooltipManager };
+export {
+    TooltipManager,
+    makeIconLink,
+    productUrlForPoint,
+    shopIconMetaForUrl,
+    youtubeUrlForPoint
+};
 
