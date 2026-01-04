@@ -153,7 +153,7 @@ body {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    font-size: 18.72px;
+    font-size: 14px;
     font-weight: 600;
     user-select: none;
     transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
@@ -214,7 +214,7 @@ body {
     border-radius: 999px;
     padding: 6px 34px 6px 12px;
     cursor: pointer;
-    font-size: 17.28px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1.2;
 }
@@ -548,7 +548,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 10px;
     padding: 10px var(--shapeLegendPadX);
-    font-size: 17.28px;
+    font-size: 14.4px;
     line-height: 1.25;
     color: var(--text);
     box-shadow: 0 14px 35px rgba(0,0,0,0.45);
@@ -593,7 +593,7 @@ body {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 900;
     line-height: 1;
     color: rgba(255,255,255,0.98);
@@ -629,7 +629,7 @@ body {
     --countryGap: 10px;
 }
 .hardness-legend .title {
-    font-size: 17.28px;
+    font-size: 14.4px;
     line-height: 1;
     font-weight: 700;
     color: rgba(255,255,255,0.88);
@@ -649,7 +649,7 @@ body {
     padding-left: calc(var(--countryW) + var(--countryGap));
 }
 .hardness-legend .label {
-    font-size: 17.28px;
+    font-size: 14.4px;
     line-height: 1;
     color: rgba(255,255,255,0.78);
     white-space: nowrap;
@@ -678,14 +678,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15.84px;
+    font-size: 13.2px;
     font-weight: 800;
     letter-spacing: 0.3px;
     color: rgba(255,255,255,0.92);
     text-shadow: 0 1px 2px rgba(0,0,0,0.45);
 }
 .hardness-legend .example {
-    font-size: 15.84px;
+    font-size: 13.2px;
     line-height: 1.15;
     color: rgba(255,255,255,0.72);
     font-variant-numeric: tabular-nums;
@@ -708,7 +708,7 @@ body {
     white-space: nowrap;
 }
 .hardness-legend .example .country.flag {
-    font-size: 23.04px;
+    font-size: 19.2px;
     line-height: 1;
     font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui;
     transform: translateY(1px);
