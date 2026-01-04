@@ -14,9 +14,9 @@ export const XIOM_ICON = 'images/xiom.png';
 
 // Axis ranges per brand
 export const BRAND_AXIS_RANGES = {
-    [BUTTERFLY]: { xMin: 55,  xMax: 105, yMin: 60,  yMax: 95 },
-    [TIBHAR]:    { xMin: 110, xMax: 135, yMin: 110, yMax: 135 },
-    [XIOM]:      { xMin: 30,  xMax: 95, yMin: 40,  yMax: 80 },
+    [BUTTERFLY]: { xMin: 55,  xMax: 105, yMin: 73,  yMax: 95 },
+    [TIBHAR]:    { xMin: 114, xMax: 132, yMin: 113, yMax: 132 },
+    [XIOM]:      { xMin: 30,  xMax: 95, yMin: 38,  yMax: 75 },
 };
 
 // Color shades for rubber hardness
