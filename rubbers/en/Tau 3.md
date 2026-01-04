@@ -1,6 +1,4 @@
-## 🏓 XIOM Tau 3 Rubber
-
-**🔹 Basic Information**
+## Product Description
 
 * **Brand:** XIOM
 * **Rubber Type:** Tacky (Club Style / Chinese Style) type
