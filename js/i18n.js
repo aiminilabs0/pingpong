@@ -7,7 +7,6 @@ const I18N = {
     en: {
         pageTitle: 'AI PingPong',
         heroTitle: '🏓 AI PingPong',
-        heroSubtitle: 'Table Tennis Rubber Comparison',
         chartTitle: 'Rubber Performance Matrix',
         chartSubtitle: 'Compare speed and spin characteristics across different rubber models',
         ariaCountry: 'Country',
@@ -54,7 +53,6 @@ const I18N = {
     ko: {
         pageTitle: 'AI PingPong',
         heroTitle: '🏓 AI PingPong',
-        heroSubtitle: '탁구 러버 비교',
         chartTitle: '러버 성능 비교',
         chartSubtitle: '러버 모델별 회전과 스피드 특성을 비교해 보세요',
         ariaCountry: '국가',
