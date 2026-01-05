@@ -1,43 +1,76 @@
-### 1. Product Description
+# Vega Pro
 
-**Vega Pro** is XIOM's representative steady-seller, a high-performance rubber designed for professional players.
+## 1. One-Line Summary & Overall Evaluation
 
-* **Basic Specifications:**
-* **Hardness:** 47.5°
+* **One-Line Summary:** "The **undisputed king of cost-performance** and the gold standard for spin-focused play, rivaling high-end rubbers at half the price."
+* **Orientation:** Spin-Oriented Offensive (Spin-Off)
+* **Overall Score:** **9.2 / 10** (Near-perfect scores for durability and value-for-money)
+
+## 2. Key Specifications
+
+* **Hardness:** **47.5°** (ESN scale) / Feels slightly firmer (around 48°+) due to the dense sponge.
+* **Weight:** **Heavy** (Approx. 49g–51g after cutting; features a high-density "Carbo Sponge").
+* **Recommended Thickness:** **MAX (2.0mm+)** for optimal performance.
+
+## 3. Performance Analysis (0–10 Scale)
+
+* **Speed: [8.0]/10**
+* It lacks the "catapult effect" found in modern high-tension rubbers (like the Omega 7 or Tenergy series). Instead, it provides **linear power**—the ball goes exactly as fast as you swing.
 
 
-* **Key Technologies & Features:**
-* **Hyper Elasto:** Uses a top sheet applied with technology that provides powerful **Spin** and high durability.
-* **Stability:** Offers excellent ability to stably "grab" the ball even during fast drive rallies close to the table, helping to minimize errors.
-* **Durability:** Lifespan is significantly improved compared to existing Tensor rubbers, allowing it to maintain performance for a long time.
+* **Spin: [9.0]/10**
+* This is the rubber's core strength. The top sheet has exceptional grip, producing heavy, dipping topspin when brushed correctly.
+
+
+* **Control: [8.5]/10**
+* Because it isn't overly bouncy, it offers great stability during short games (pushes, flicks) and blocking. It minimizes unforced errors from "overshooting."
+
+
+* **Throw Angle: High**
+* It creates a **pronounced arc (trajectory)** that clears the net with plenty of safety. The ball dips sharply at the end of the table.
+
+
+
+## 4. Feeling
+
+* **Solid & Hard:** It doesn't have a "clicky" sound. Instead, it offers a **firm, solid "thud"** upon impact.
+* **Dwell Time:** While the sponge is firm, the top sheet structure allows the ball to **sink in and "grab"** for a significant moment. This makes it an excellent tool for players looking to master the feeling of "looping" the ball.
+
+## 5. Pros & Cons
+
+* **Pros:**
+* **Durability (The "Zombie" Rubber):** One of the longest-lasting ESN rubbers. The top sheet resists wear, and the sponge maintains its tension for a long time.
+* **Value for Money:** Offers a flight path similar to the Tenergy 05 at roughly half the cost.
+* **Safe Arc:** The high throw angle significantly reduces the chance of the ball hitting the net during loops.
+
+
+* **Cons:**
+* **Weight:** It is relatively heavy by modern standards. Users must be mindful of the total racket weight if used on both sides.
+* **Impact Requirement:** Since it isn't "bouncy" by default, the ball may fall short if the player’s impact/swing speed is too weak.
+* **Shrinkage:** The sponge tends to shrink more than others when removed and re-glued.
+
+
+
+## 6. Target Audience & Combinations
+
+* **Recommended User:**
+* **Beginners to Intermediates** learning the fundamentals of the topspin loop.
+* All-around offensive players looking for **heavy spin and reliability** without breaking the bank.
+* Power-loopers who prefer to hit through the ball with strong physical impact.
+
+
+* **Recommended Position:**
+* **Forehand:** Ideally suited for the forehand to maximize power and spin.
+* *Backhand:* Can feel cumbersome or "dead" on the backhand unless the user has high-level technical skills and strong wrist impact.
+
+
+* **Similar Rubbers:**
+* **Butterfly Tenergy 05:** The original benchmark for this rubber (Higher performance, but double the price).
+* **Donic Baracuda:** Similar spin-focused profile, though slightly softer and slower.
 
 
 
 ---
 
-### 2. Synthesis of User Reviews
-
-Many table tennis enthusiasts consider this the "Best Value-for-Money Go-To Rubber" or a "Budget-friendly alternative to Tenergy 05."
-
-**👍 Advantages (Pros)**
-
-* **Excellent Spin and Grip:** It has an exceptional ability to "Deep Drag" the ball, generating powerful rotation during drives. Users report feeling the top sheet firmly "catching" the ball.
-* **High Stability (High Arc):** The ball's trajectory (Arc) is high, which reduces net errors. Stability is particularly good for loop drives or connection-oriented play.
-* **Overwhelming Value & Durability:** It delivers performance close to top-tier rubbers at a very reasonable price point, and the consensus is that it is economical due to its long lifespan.
-* **Honest Repulsion:** It has a "Linear" characteristic where the ball travels exactly as much as the power the user puts into it, making control predictable.
-
-**👎 Disadvantages & Preferences (Cons)**
-
-* **Hard Impact Feel:** Due to the 47.5° hardness, it may feel somewhat stiff or dull/muted to beginners or those who prefer soft rubbers.
-* **Requires Impact:** It is not a spring-like rubber with extreme automatic repulsion. If the user's impact is weak, the ball may not travel as far as expected. (Therefore, it is recommended for intermediate players and above rather than complete beginners).
-* **Weight:** There are opinions that it is somewhat heavy compared to recently released lightweight rubbers.
-
-**💡 Comprehensive Summary**
-
-> **"A balanced, all-around rubber that reacts honestly to your stroke, spins well, and has a long lifespan."**
-
-**Vega Pro** is most recommended for **intermediate-level players and above** who have developed a certain level of impact. It is optimized for learning or utilizing the sensation of **"grabbing the ball to generate spin"** rather than relying on the rubber's automatic bounce. It is evaluated as a standard rubber suitable for both forehand and backhand use.
-
----
-
-**Would you like me to recommend a blade that pairs well with this rubber, or compare it with another specific rubber?**
+**Coach's Tip:**
+The Vega Pro is a "brutally honest" rubber. If you feel the ball isn't traveling fast enough, it’s usually a sign to check your swing mechanics rather than blaming the equipment. It is the perfect training partner for developing a "true" offensive game.

@@ -49,13 +49,10 @@ const RUBBER_NAME_KO = {
     'Z52.5': 'Z52.5',
     'X47.5': 'X47.5',
     'H52.5': 'H52.5',
-
     'Sigma 5': '시그마 5',
     'Tau 3': '타우 3',
     'Omega7 Pro': '오메가7 프로',
     'Guang': '광',
-
-    // Vega series
     'Vega Pro': '베가 프로',
     'Vega Asia': '베가 아시아',
     'Vega Europe': '베가 유럽',
