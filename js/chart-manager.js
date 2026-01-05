@@ -282,7 +282,7 @@ class ChartManager {
         actionsEl.hidden = !(aShop || aYt);
     }
 
-    async loadRubberDetails(label, slot, pointData) {
+    async loadRubberDetails(label, slot, pointData, brand) {
         const targetSlot = slot === 'B' ? 'B' : 'A';
         const els = this.getRubberDetailsEls();
         if (!els) return;
@@ -307,8 +307,20 @@ class ChartManager {
         const lang = (this.i18nManager?.getLang?.() || 'en').toLowerCase();
         const safeLang = (lang === 'ko' || lang === 'en') ? lang : 'en';
         const baseName = `${encodeURIComponent(rawLabel)}.md`;
-        const primaryUrl = `rubbers/${safeLang}/${baseName}`;
-        const fallbackUrl = `rubbers/${safeLang === 'ko' ? 'en' : 'ko'}/${baseName}`;
+
+        // Rubber markdown is stored under: /rubbers/<company>/<lang>/*.md
+        const rawBrand = String(brand ?? pointData?.brand ?? pointData?.company ?? this.currentBrand ?? '').trim();
+        const companyFolder = (rawBrand === BUTTERFLY)
+            ? 'butterfly'
+            : (rawBrand === TIBHAR)
+                ? 'tibhar'
+                : (rawBrand === XIOM)
+                    ? 'xiom'
+                    : rawBrand.toLowerCase();
+        const safeCompany = encodeURIComponent(companyFolder || 'butterfly');
+
+        const primaryUrl = `rubbers/${safeCompany}/${safeLang}/${baseName}`;
+        const fallbackUrl = `rubbers/${safeCompany}/${safeLang === 'ko' ? 'en' : 'ko'}/${baseName}`;
         try {
             let res = await fetch(primaryUrl, { cache: 'no-store' });
             const stillValid = targetSlot === 'B'
@@ -363,7 +375,7 @@ class ChartManager {
             if (selA && selA.datasetIndex != null && selA.dataIndex != null) {
                 const dsA = this.chart?.data?.datasets?.[selA.datasetIndex];
                 const pointDataA = dsA?.data?.[selA.dataIndex] || {};
-                void this.loadRubberDetails(pointDataA?.label, 'A', pointDataA);
+                void this.loadRubberDetails(pointDataA?.label, 'A', pointDataA, dsA?.label);
             } else {
                 // No selection: show placeholder for Set A
                 const els = this.getRubberDetailsEls();
@@ -380,7 +392,7 @@ class ChartManager {
             if (selB && selB.datasetIndex != null && selB.dataIndex != null) {
                 const dsB = this.chart?.data?.datasets?.[selB.datasetIndex];
                 const pointDataB = dsB?.data?.[selB.dataIndex] || {};
-                void this.loadRubberDetails(pointDataB?.label, 'B', pointDataB);
+                void this.loadRubberDetails(pointDataB?.label, 'B', pointDataB, dsB?.label);
             } else {
                 // No selection: show placeholder for Set B (always visible)
                 const els = this.getRubberDetailsEls();
@@ -876,11 +888,11 @@ class ChartManager {
         // the dataset may be hidden; still allow loading details without chart focus.
         if (!el && !noBrandSwitch) return false;
 
-        // Update the rubber details panel (loaded from /rubbers/<lang>/*.md).
+        // Update the rubber details panel (loaded from /rubbers/<company>/<lang>/*.md).
         try {
             const ds = this.chart.data.datasets[match.datasetIndex];
             const pointData = ds?.data?.[match.dataIndex] || {};
-            void this.loadRubberDetails(pointData?.label, slot, pointData);
+            void this.loadRubberDetails(pointData?.label, slot, pointData, ds?.label ?? match.brand);
         } catch {
             // ignore
         }
