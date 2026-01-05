@@ -6,7 +6,7 @@
     <title>AI PingPong</title>
     <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
     <!-- Bump this value on deploy to bust browser caches for local assets (CSS/JS). -->
-    <meta name="app-version" content="0.0.12" />
+    <meta name="app-version" content="0.0.13" />
     <script>
         (function () {
             const v = document.querySelector('meta[name="app-version"]')?.content || "";
@@ -38,85 +38,102 @@
 </head>
 <body>
 
-<div class="chart-container">
-    <div class="lang-switch" aria-label="Country">
-        <span class="select-wrap">
-            <select id="countrySelect" aria-label="Country">
-                <option value="kr">🇰🇷 Korea</option>
-                <option value="us">🇺🇸 USA</option>
-            </select>
-        </span>
+<div class="container">
+    <!-- Header -->
+    <header class="hero">
+        <h1 class="hero__title" data-i18n="heroTitle">🏓 AI PingPong</h1>
+        <p class="hero__subtitle subtitle" data-i18n="heroSubtitle">Table Tennis Rubber Comparison Tool</p>
+    </header>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="tabs brand-tabs" role="tablist" aria-label="Brand" id="brandTabs">
+            <button class="tab brand-tab active" type="button" role="tab" aria-selected="true" data-brand="Butterfly">
+                <img src="images/butterfly.ico" alt="" aria-hidden="true" />
+                <span data-i18n="brandButterfly">Butterfly</span>
+            </button>
+            <button class="tab brand-tab" type="button" role="tab" aria-selected="false" data-brand="Tibhar">
+                <img src="images/tibhar.png" alt="" aria-hidden="true" />
+                <span data-i18n="brandTibhar">Tibhar</span>
+            </button>
+            <button class="tab brand-tab" type="button" role="tab" aria-selected="false" data-brand="XIOM">
+                <img src="images/xiom.png" alt="" aria-hidden="true" />
+                <span data-i18n="brandXiom">XIOM</span>
+            </button>
+        </div>
+
+        <div class="lang-switch" aria-label="Country">
+            <span class="select-wrap">
+                <select id="countrySelect" class="country-select" aria-label="Country">
+                    <option value="kr">🇰🇷 Korea</option>
+                    <option value="us">🇺🇸 USA</option>
+                </select>
+            </span>
+        </div>
     </div>
 
-    <div class="tabs" role="tablist" aria-label="Brand" id="brandTabs">
-        <button class="tab active" type="button" role="tab" aria-selected="true" data-brand="Butterfly">
-            <img src="images/butterfly.ico" alt="" aria-hidden="true" />
-            <span data-i18n="brandButterfly">Butterfly</span>
-        </button>
-        <button class="tab" type="button" role="tab" aria-selected="false" data-brand="Tibhar">
-            <img src="images/tibhar.png" alt="" aria-hidden="true" />
-            <span data-i18n="brandTibhar">Tibhar</span>
-        </button>
-        <button class="tab" type="button" role="tab" aria-selected="false" data-brand="XIOM">
-            <img src="images/xiom.png" alt="" aria-hidden="true" />
-            <span data-i18n="brandXiom">XIOM</span>
-        </button>
-    </div>
+    <!-- Chart -->
+    <section class="chart-wrapper">
+        <div class="chart-header">
+            <h2 class="chart-title" data-i18n="chartTitle">Rubber Performance Matrix</h2>
+            <p class="chart-subtitle" data-i18n="chartSubtitle">
+                Compare speed and spin characteristics across different rubber models
+            </p>
 
-    <div class="canvas-wrap">
-        <canvas id="rubberChart"></canvas>
-        <div class="hardness-legend" aria-hidden="true">
-            <div class="content">
-                <div class="row">
-                    <span class="bar" data-i18n="legendHardness">Hardness</span>
-                </div>
-                <div class="example">
-                    <div class="ex-line">
-                        <span class="country flag" title="Germany">🇩🇪</span>
-                        <div class="nums">
-                            <span class="n left">40</span>
-                            <span class="n mid">47.5</span>
-                            <span class="n right">55</span>
-                        </div>
+            <div class="compare-instruction" aria-hidden="true">
+                <span class="compare-instruction__line" data-i18n="compareInstrLine"></span>
+            </div>
+        </div>
+
+        <div class="canvas-wrap">
+            <canvas id="rubberChart"></canvas>
+            <div class="hardness-legend" aria-hidden="true">
+                <div class="content">
+                    <div class="row">
+                        <span class="bar" data-i18n="legendHardness">Hardness</span>
                     </div>
-                    <div class="ex-line">
-                        <span class="country flag" title="Japan">🇯🇵</span>
-                        <div class="nums">
-                            <span class="n left">33</span>
-                            <span class="n mid">36</span>
-                            <span class="n right">44</span>
+                    <div class="example">
+                        <div class="ex-line">
+                            <span class="country flag" title="Germany">🇩🇪</span>
+                            <div class="nums">
+                                <span class="n left">40</span>
+                                <span class="n mid">47.5</span>
+                                <span class="n right">55</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="ex-line">
-                        <span class="country flag" title="China">🇨🇳</span>
-                        <div class="nums">
-                            <span class="n left">35</span>
-                            <span class="n mid">39</span>
-                            <span class="n right">41</span>
+                        <div class="ex-line">
+                            <span class="country flag" title="Japan">🇯🇵</span>
+                            <div class="nums">
+                                <span class="n left">33</span>
+                                <span class="n mid">36</span>
+                                <span class="n right">44</span>
+                            </div>
+                        </div>
+                        <div class="ex-line">
+                            <span class="country flag" title="China">🇨🇳</span>
+                            <div class="nums">
+                                <span class="n left">35</span>
+                                <span class="n mid">39</span>
+                                <span class="n right">41</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="shape-legend" aria-hidden="true">
-            <div class="row">
-                <span class="marker badgeB">B</span>
-                <span data-i18n="legendBestSeller">BestSeller</span>
-            </div>
-            <div class="row">
-                <span class="marker circle"></span>
+
+        <div class="legend" aria-hidden="true">
+            <div class="legend-item">
+                <div class="legend-marker"></div>
                 <span data-i18n="legendPimplesIn">Pimples-in</span>
             </div>
-            <div class="row">
-                <span class="marker rectRot"></span>
+            <div class="legend-item">
+                <div class="legend-marker hybrid"></div>
                 <span data-i18n="legendHybrid">Hybrid</span>
             </div>
         </div>
-    </div>
 
-    <div class="compare-instruction" aria-hidden="true">
-        <span class="compare-instruction__line" data-i18n="compareInstrLine"></span>
-    </div>
+    </section>
 
     <!-- Rubber compare panel (loaded from /rubbers/<lang>/*.md and /rubbers/comparison/<lang>/*.md) -->
     <section id="rubberCompare" class="rubber-details rubber-compare" aria-live="polite" hidden>
@@ -145,7 +162,7 @@
             <div id="rubberComparisonBody" class="rubber-details__body"></div>
         </article>
     </section>
-</div>
+
 
 <script>
     (function () {

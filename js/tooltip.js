@@ -149,6 +149,7 @@ class TooltipManager {
         // Create clickable title that links to the product page
         const title = document.createElement('div');
         title.className = 't';
+        const titleText = this.i18nManager.localizeRubberName(r.label ?? '');
         
         if (product) {
             const titleLink = document.createElement('a');
@@ -156,13 +157,21 @@ class TooltipManager {
             titleLink.target = '_blank';
             titleLink.rel = 'noopener noreferrer';
             titleLink.className = 'tooltip-title-link';
-            titleLink.textContent = this.i18nManager.localizeRubberName(r.label ?? '');
+            titleLink.textContent = titleText;
             titleLink.addEventListener('click', () => {
                 this.urlManager.setRubberParam(r?.label);
             });
             title.appendChild(titleLink);
         } else {
-            title.textContent = this.i18nManager.localizeRubberName(r.label ?? '');
+            title.textContent = titleText;
+        }
+
+        // Optional: Best Seller badge
+        if (r && r.bestSeller) {
+            const badge = document.createElement('span');
+            badge.className = 'badge';
+            badge.textContent = this.i18nManager.t('tooltipBestSeller');
+            head.appendChild(badge);
         }
 
         const shopMeta = shopIconMetaForUrl(product, country, this.i18nManager);
@@ -188,10 +197,20 @@ class TooltipManager {
             actions.appendChild(aYt);
         }
 
-        head.appendChild(actions);
-
+        // Order: title (left) then actions (right)
         head.appendChild(title);
+        head.appendChild(actions);
         this.tooltipEl.appendChild(head);
+
+        // Always show spin/speed first (from parsed values when available)
+        const spin = typeof dp?.parsed?.x === 'number' ? dp.parsed.x : (typeof r.x === 'number' ? r.x : null);
+        const speed = typeof dp?.parsed?.y === 'number' ? dp.parsed.y : (typeof r.y === 'number' ? r.y : null);
+        if (typeof spin === 'number' && typeof speed === 'number') {
+            const row = document.createElement('div');
+            row.className = 'row row--primary';
+            row.textContent = this.i18nManager.t('tooltipSpinSpeed', { spin, speed });
+            this.tooltipEl.appendChild(row);
+        }
 
         const rows = [];
         if (r.type) rows.push(`${this.i18nManager.t('tooltipType')}: ${r.type}`);

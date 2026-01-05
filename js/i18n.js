@@ -6,6 +6,10 @@
 const I18N = {
     en: {
         pageTitle: 'AI PingPong',
+        heroTitle: '🏓 AI PingPong',
+        heroSubtitle: 'Professional Table Tennis Rubber Comparison',
+        chartTitle: 'Rubber Performance Matrix',
+        chartSubtitle: 'Compare speed and spin characteristics across different rubber models',
         ariaCountry: 'Country',
         countryKorea: 'Korea',
         countryUsa: 'USA',
@@ -20,6 +24,7 @@ const I18N = {
         axisSpin: 'Spin',
         axisSpeed: 'Speed',
         tooltipSpinSpeed: 'Spin: {spin}, Speed: {speed}',
+        tooltipBestSeller: '⭐ Best Seller',
         tooltipType: 'Type',
         tooltipArc: 'Arc',
         tooltipThickness: 'Thickness',
@@ -46,6 +51,10 @@ const I18N = {
     },
     ko: {
         pageTitle: 'AI PingPong',
+        heroTitle: '🏓 AI PingPong',
+        heroSubtitle: '프로 탁구 러버 비교',
+        chartTitle: '러버 성능 비교',
+        chartSubtitle: '러버 모델별 회전과 스피드 특성을 비교해 보세요',
         ariaCountry: '국가',
         countryKorea: '한국',
         countryUsa: 'USA',
@@ -60,6 +69,7 @@ const I18N = {
         axisSpin: '회전',
         axisSpeed: '스피드',
         tooltipSpinSpeed: '회전: {spin}, 스피드: {speed}',
+        tooltipBestSeller: '⭐ 베스트셀러',
         tooltipType: '타입',
         tooltipArc: '궤도',
         tooltipThickness: '두께',
