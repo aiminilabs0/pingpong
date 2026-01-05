@@ -181,7 +181,7 @@ body {
     box-shadow: 0 10px 40px var(--shadow);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 0;
     overflow: hidden;
 }
 
@@ -191,6 +191,35 @@ body {
 
 .chart-header {
     margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.chart-header__left {
+    flex: 1 1 520px;
+    min-width: min(520px, 100%);
+}
+
+.chart-header__right {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-start;
+}
+
+/* Hardness legend becomes a normal (non-overlay) box when placed in the header. */
+.chart-header .hardness-legend {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: fit-content;
+    max-width: 320px;
+    margin: 0;
+    pointer-events: none;
 }
 
 .chart-title {
@@ -305,7 +334,7 @@ body {
     position: relative;
     flex: 0 0 auto;
     height: 600px;
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 /* --- Legend (below chart) --- */
@@ -400,6 +429,15 @@ body {
     .canvas-wrap {
         height: 400px;
     }
+
+    .chart-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .chart-header__right {
+        justify-content: flex-start;
+    }
 }
 
 /* --- Compare instruction (inside chart container, top-left area) --- */
@@ -417,9 +455,9 @@ body {
     font-size: 17.28px;
     line-height: 1.25;
     pointer-events: none;
-    max-width: min(360px, calc(100% - 16px));
-    text-align: center;
-    margin: 6px auto 0 auto;
+    max-width: none;
+    text-align: left;
+    margin: 6px 0 0 0;
 }
 .compare-instruction__line {
     display: inline-block;
@@ -433,6 +471,33 @@ body {
 }
 .compare-instruction__slot--b {
     color: rgba(239, 68, 68, 0.96);
+}
+
+/* --- Rubber slot badge (1/2) --- */
+.rubber-slot-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+    line-height: 1;
+    letter-spacing: -0.2px;
+    border: 1px solid rgba(255,255,255,0.38);
+    box-shadow:
+        0 1px 0 rgba(255,255,255,0.10),
+        0 6px 14px rgba(0,0,0,0.40);
+    transform: translateY(-0.5px);
+}
+.rubber-slot-badge--a {
+    background: rgba(124, 211, 255, 0.98);
+    color: rgba(0,0,0,0.82);
+}
+.rubber-slot-badge--b {
+    background: rgba(239, 68, 68, 0.98);
+    color: rgba(255,255,255,0.95);
 }
 
 /* --- Rubber details panel (below chart) --- */
@@ -460,6 +525,9 @@ body {
     gap: 10px;
 }
 .rubber-compare__name {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -484,16 +552,23 @@ body {
     font-weight: 800;
 }
 .rubber-compare__slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     flex: 0 0 auto;
     font-size: 15.84px;
     font-weight: 900;
-    letter-spacing: 0.7px;
-    text-transform: uppercase;
     color: rgba(255,255,255,0.72);
-    padding: 4px 8px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.05);
+}
+.rubber-compare__slot--a {
+    color: rgba(124, 211, 255, 0.96);
+    border-color: rgba(124, 211, 255, 0.22);
+    background: rgba(124, 211, 255, 0.08);
+}
+.rubber-compare__slot--b {
+    color: rgba(239, 68, 68, 0.96);
+    border-color: rgba(239, 68, 68, 0.22);
+    background: rgba(239, 68, 68, 0.08);
 }
 .rubber-compare__grid {
     display: grid;
@@ -533,6 +608,17 @@ body {
 .rubber-details__title {
     flex: 1 1 auto;
     min-width: 0;
+}
+.rubber-details__title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.rubber-details__title-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .rubber-details__title-link {
     color: inherit;
@@ -601,6 +687,11 @@ body {
     font-size: 16px;
     color: rgba(255,255,255,0.82);
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+
+.rubber-placeholder {
+    margin: 0;
+    color: var(--text-muted);
 }
 
 /* Markdown content styling inside rubber details */

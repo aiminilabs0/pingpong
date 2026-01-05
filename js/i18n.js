@@ -7,7 +7,7 @@ const I18N = {
     en: {
         pageTitle: 'AI PingPong',
         heroTitle: '🏓 AI PingPong',
-        heroSubtitle: 'Professional Table Tennis Rubber Comparison',
+        heroSubtitle: 'Table Tennis Rubber Comparison',
         chartTitle: 'Rubber Performance Matrix',
         chartSubtitle: 'Compare speed and spin characteristics across different rubber models',
         ariaCountry: 'Country',
@@ -41,18 +41,19 @@ const I18N = {
         iconLink: 'Link',
         iconYouTube: 'YouTube',
 
-        slotA: 'Rubber 1',
-        slotB: 'Rubber 2',
+        slotA: 'Rubber',
+        slotB: 'Rubber',
         slotComparison: 'Comparison',
         compareHint: 'Click a point to set Rubber 1. Shift+click to set Rubber 2.',
         loading: 'Loading…',
         noInfoYet: 'No info yet.',
+        noSelectedRubber: 'No rubber selected.',
         noComparisonYet: 'No comparison yet.'
     },
     ko: {
         pageTitle: 'AI PingPong',
         heroTitle: '🏓 AI PingPong',
-        heroSubtitle: '프로 탁구 러버 비교',
+        heroSubtitle: '탁구 러버 비교',
         chartTitle: '러버 성능 비교',
         chartSubtitle: '러버 모델별 회전과 스피드 특성을 비교해 보세요',
         ariaCountry: '국가',
@@ -86,12 +87,13 @@ const I18N = {
         iconLink: '링크',
         iconYouTube: '유튜브',
 
-        slotA: '러버 1',
-        slotB: '러버 2',
+        slotA: '러버',
+        slotB: '러버',
         slotComparison: '비교',
         compareHint: '차트에서 클릭하면 러버 1, Shift+클릭하면 러버 2로 선택됩니다.',
         loading: '불러오는 중…',
         noInfoYet: '정보가 아직 없습니다.',
+        noSelectedRubber: '선택된 러버가 없습니다',
         noComparisonYet: '비교 정보가 아직 없습니다.'
     }
 };
@@ -236,9 +238,9 @@ class I18nManager {
 
     getCompareInstrLineHtml() {
         if (this.currentLang === 'ko') {
-            return '💡 비교: <span class="compare-instruction__slot compare-instruction__slot--a">러버1</span> 클릭 / <span class="compare-instruction__slot compare-instruction__slot--b">러버2</span> Shift+클릭';
+            return '💡 <span class="rubber-slot-badge rubber-slot-badge--a">1</span> <span class="compare-instruction__slot compare-instruction__slot--a">러버</span>: 클릭, <span class="rubber-slot-badge rubber-slot-badge--b">2</span> <span class="compare-instruction__slot compare-instruction__slot--b">러버</span>: Shift+클릭';
         }
-        return '💡 Compare: Click <span class="compare-instruction__slot compare-instruction__slot--a">Rubber 1</span>, Shift+click <span class="compare-instruction__slot compare-instruction__slot--b">Rubber 2</span>';
+        return '💡 Click for <span class="rubber-slot-badge rubber-slot-badge--a">1</span> <span class="compare-instruction__slot compare-instruction__slot--a">Rubber</span>, Shift+click for <span class="rubber-slot-badge rubber-slot-badge--b">2</span> <span class="compare-instruction__slot compare-instruction__slot--b">Rubber</span>';
     }
 }
 

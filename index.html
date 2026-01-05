@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI PingPong</title>
-    <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="images/favicon.ico" type="image/svg+xml" />
     <!-- Bump this value on deploy to bust browser caches for local assets (CSS/JS). -->
-    <meta name="app-version" content="0.0.13" />
+    <meta name="app-version" content="0.0.14" />
     <script>
         (function () {
             const v = document.querySelector('meta[name="app-version"]')?.content || "";
@@ -75,51 +75,56 @@
     <!-- Chart -->
     <section class="chart-wrapper">
         <div class="chart-header">
-            <h2 class="chart-title" data-i18n="chartTitle">Rubber Performance Matrix</h2>
-            <p class="chart-subtitle" data-i18n="chartSubtitle">
-                Compare speed and spin characteristics across different rubber models
-            </p>
+            <div class="chart-header__left">
+                <h2 class="chart-title" data-i18n="chartTitle">Rubber Performance Matrix</h2>
+                <p class="chart-subtitle" data-i18n="chartSubtitle">
+                    Compare speed and spin characteristics across different rubber models
+                </p>
 
-            <div class="compare-instruction" aria-hidden="true">
-                <span class="compare-instruction__line" data-i18n="compareInstrLine"></span>
+                <div class="compare-instruction" aria-hidden="true">
+                    <span class="compare-instruction__line" data-i18n="compareInstrLine"></span>
+                </div>
             </div>
-        </div>
 
-        <div class="canvas-wrap">
-            <canvas id="rubberChart"></canvas>
-            <div class="hardness-legend" aria-hidden="true">
-                <div class="content">
-                    <div class="row">
-                        <span class="bar" data-i18n="legendHardness">Hardness</span>
-                    </div>
-                    <div class="example">
-                        <div class="ex-line">
-                            <span class="country flag" title="Germany">🇩🇪</span>
-                            <div class="nums">
-                                <span class="n left">40</span>
-                                <span class="n mid">47.5</span>
-                                <span class="n right">55</span>
-                            </div>
+            <div class="chart-header__right" aria-hidden="true">
+                <div class="hardness-legend">
+                    <div class="content">
+                        <div class="row">
+                            <span class="bar" data-i18n="legendHardness">Hardness</span>
                         </div>
-                        <div class="ex-line">
-                            <span class="country flag" title="Japan">🇯🇵</span>
-                            <div class="nums">
-                                <span class="n left">33</span>
-                                <span class="n mid">36</span>
-                                <span class="n right">44</span>
+                        <div class="example">
+                            <div class="ex-line">
+                                <span class="country flag" title="Germany">🇩🇪</span>
+                                <div class="nums">
+                                    <span class="n left">40</span>
+                                    <span class="n mid">47.5</span>
+                                    <span class="n right">55</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="ex-line">
-                            <span class="country flag" title="China">🇨🇳</span>
-                            <div class="nums">
-                                <span class="n left">35</span>
-                                <span class="n mid">39</span>
-                                <span class="n right">41</span>
+                            <div class="ex-line">
+                                <span class="country flag" title="Japan">🇯🇵</span>
+                                <div class="nums">
+                                    <span class="n left">33</span>
+                                    <span class="n mid">36</span>
+                                    <span class="n right">44</span>
+                                </div>
+                            </div>
+                            <div class="ex-line">
+                                <span class="country flag" title="China">🇨🇳</span>
+                                <div class="nums">
+                                    <span class="n left">35</span>
+                                    <span class="n mid">39</span>
+                                    <span class="n right">41</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="canvas-wrap">
+            <canvas id="rubberChart"></canvas>
         </div>
 
         <div class="legend" aria-hidden="true">
@@ -163,6 +168,7 @@
         </article>
     </section>
 
+ </div>
 
 <script>
     (function () {

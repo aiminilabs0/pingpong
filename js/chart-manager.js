@@ -75,21 +75,35 @@ class ChartManager {
     clearRubberDetails() {
         const els = this.getRubberDetailsEls();
         if (!els) return;
-        els.titleA.textContent = '';
+        // Always show the compare panel (even before any click) with placeholders.
+        els.container.hidden = false;
+
+        this._renderSlotTitle(els.titleA, 'A', this.i18nManager.t('slotA'));
         try { while (els.actionsA.firstChild) els.actionsA.removeChild(els.actionsA.firstChild); } catch { /* ignore */ }
         els.actionsA.hidden = true;
-        els.bodyA.innerHTML = '';
-        els.titleB.textContent = '';
+        els.bodyA.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noSelectedRubber')}</p>`;
+
+        els.setB.hidden = false;
+        this._renderSlotTitle(els.titleB, 'B', this.i18nManager.t('slotB'));
         try { while (els.actionsB.firstChild) els.actionsB.removeChild(els.actionsB.firstChild); } catch { /* ignore */ }
         els.actionsB.hidden = true;
-        els.bodyB.innerHTML = '';
-        els.setB.hidden = true;
+        els.bodyB.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noSelectedRubber')}</p>`;
 
-        els.compareTitle.textContent = '';
-        els.compareBody.innerHTML = '';
-        els.compare.hidden = true;
-
-        els.container.hidden = true;
+        els.compare.hidden = false;
+        try {
+            while (els.compareTitle.firstChild) els.compareTitle.removeChild(els.compareTitle.firstChild);
+            const aSpan = this._buildCompareSlotNode('A');
+            const vsSpan = document.createElement('span');
+            vsSpan.className = 'rubber-compare__vs';
+            vsSpan.textContent = 'vs';
+            const bSpan = this._buildCompareSlotNode('B');
+            els.compareTitle.appendChild(aSpan);
+            els.compareTitle.appendChild(vsSpan);
+            els.compareTitle.appendChild(bSpan);
+        } catch {
+            els.compareTitle.textContent = `${this.i18nManager.t('slotA')} vs ${this.i18nManager.t('slotB')}`;
+        }
+        els.compareBody.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noComparisonYet')}</p>`;
     }
 
     clearRubberSelection(opts) {
@@ -160,6 +174,49 @@ class ChartManager {
         }
     }
 
+    _makeSlotBadge(slot) {
+        const targetSlot = slot === 'B' ? 'B' : 'A';
+        const badge = document.createElement('span');
+        badge.className = `rubber-slot-badge rubber-slot-badge--${targetSlot === 'B' ? 'b' : 'a'}`;
+        badge.textContent = targetSlot === 'B' ? '2' : '1';
+        badge.title = this.i18nManager.t(targetSlot === 'B' ? 'slotB' : 'slotA');
+        badge.setAttribute('aria-hidden', 'true');
+        return badge;
+    }
+
+    _renderSlotTitle(titleEl, slot, content) {
+        this._clearEl(titleEl);
+        titleEl.appendChild(this._makeSlotBadge(slot));
+
+        if (typeof content === 'string') {
+            const span = document.createElement('span');
+            span.className = 'rubber-details__title-text';
+            span.textContent = content;
+            titleEl.appendChild(span);
+            return;
+        }
+
+        if (content) titleEl.appendChild(content);
+    }
+
+    _buildCompareSlotNode(slot) {
+        const targetSlot = slot === 'B' ? 'B' : 'A';
+        const span = document.createElement('span');
+        span.className = `rubber-compare__slot rubber-compare__slot--${targetSlot === 'B' ? 'b' : 'a'}`;
+        span.appendChild(this._makeSlotBadge(targetSlot));
+        span.appendChild(document.createTextNode(this.i18nManager.t(targetSlot === 'B' ? 'slotB' : 'slotA')));
+        return span;
+    }
+
+    _buildCompareNameNode(slot, label) {
+        const targetSlot = slot === 'B' ? 'B' : 'A';
+        const span = document.createElement('span');
+        span.className = `rubber-compare__name rubber-compare__name--${targetSlot === 'B' ? 'b' : 'a'}`;
+        span.appendChild(this._makeSlotBadge(targetSlot));
+        span.appendChild(document.createTextNode(String(label || '')));
+        return span;
+    }
+
     _renderRubberDetailsHeader(label, pointData, slot) {
         const targetSlot = slot === 'B' ? 'B' : 'A';
         const els = this.getRubberDetailsEls();
@@ -170,7 +227,7 @@ class ChartManager {
 
         const rawLabel = String(label || pointData?.label || '').trim();
         if (!rawLabel) {
-            titleEl.textContent = '';
+            this._renderSlotTitle(titleEl, targetSlot, this.i18nManager.t(targetSlot === 'B' ? 'slotB' : 'slotA'));
             this._clearEl(actionsEl);
             actionsEl.hidden = true;
             return;
@@ -182,20 +239,22 @@ class ChartManager {
         const youtube = youtubeUrlForPoint(pointData || {}, country);
 
         // Title: link to product page when available (same behavior as the chart tooltip).
-        this._clearEl(titleEl);
         if (product) {
             const a = document.createElement('a');
             a.href = product;
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
-            a.className = 'rubber-details__title-link';
+            a.className = 'rubber-details__title-link rubber-details__title-text';
             a.textContent = localizedLabel;
             a.addEventListener('click', () => {
                 try { this.urlManager?.setRubberParam?.(rawLabel); } catch { /* ignore */ }
             });
-            titleEl.appendChild(a);
+            this._renderSlotTitle(titleEl, targetSlot, a);
         } else {
-            titleEl.textContent = localizedLabel;
+            const t = document.createElement('span');
+            t.className = 'rubber-details__title-text';
+            t.textContent = localizedLabel;
+            this._renderSlotTitle(titleEl, targetSlot, t);
         }
 
         // Actions: shop + YouTube icons.
@@ -237,8 +296,7 @@ class ChartManager {
 
         if (!rawLabel) {
             this._renderRubberDetailsHeader('', null, targetSlot);
-            bodyEl.innerHTML = '';
-            if (targetSlot === 'B') els.setB.hidden = true;
+            bodyEl.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noInfoYet')}</p>`;
             this.updateComparisonPanel();
             return;
         }
@@ -306,6 +364,16 @@ class ChartManager {
                 const dsA = this.chart?.data?.datasets?.[selA.datasetIndex];
                 const pointDataA = dsA?.data?.[selA.dataIndex] || {};
                 void this.loadRubberDetails(pointDataA?.label, 'A', pointDataA);
+            } else {
+                // No selection: show placeholder for Set A
+                const els = this.getRubberDetailsEls();
+                if (els) {
+                    els.container.hidden = false;
+                    this._renderSlotTitle(els.titleA, 'A', this.i18nManager.t('slotA'));
+                    this._clearEl(els.actionsA);
+                    els.actionsA.hidden = true;
+                    els.bodyA.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noSelectedRubber')}</p>`;
+                }
             }
 
             const selB = this.selectedRubberB;
@@ -314,14 +382,15 @@ class ChartManager {
                 const pointDataB = dsB?.data?.[selB.dataIndex] || {};
                 void this.loadRubberDetails(pointDataB?.label, 'B', pointDataB);
             } else {
-                // Ensure Set B is hidden if not selected
+                // No selection: show placeholder for Set B (always visible)
                 const els = this.getRubberDetailsEls();
                 if (els) {
-                    els.titleB.textContent = '';
+                    els.container.hidden = false;
+                    els.setB.hidden = false;
+                    this._renderSlotTitle(els.titleB, 'B', this.i18nManager.t('slotB'));
                     this._clearEl(els.actionsB);
                     els.actionsB.hidden = true;
-                    els.bodyB.innerHTML = '';
-                    els.setB.hidden = true;
+                    els.bodyB.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noSelectedRubber')}</p>`;
                 }
                 this.updateComparisonPanel();
             }
@@ -337,9 +406,22 @@ class ChartManager {
         const a = String(labelA || '').trim();
         const b = String(labelB || '').trim();
         if (!a || !b) {
-            els.compare.hidden = true;
-            els.compareTitle.textContent = '';
-            els.compareBody.innerHTML = '';
+            // Show placeholder comparison card until both rubbers are selected
+            els.compare.hidden = false;
+            try {
+                while (els.compareTitle.firstChild) els.compareTitle.removeChild(els.compareTitle.firstChild);
+                const aSpan = this._buildCompareSlotNode('A');
+                const vsSpan = document.createElement('span');
+                vsSpan.className = 'rubber-compare__vs';
+                vsSpan.textContent = 'vs';
+                const bSpan = this._buildCompareSlotNode('B');
+                els.compareTitle.appendChild(aSpan);
+                els.compareTitle.appendChild(vsSpan);
+                els.compareTitle.appendChild(bSpan);
+            } catch {
+                els.compareTitle.textContent = `${this.i18nManager.t('slotA')} vs ${this.i18nManager.t('slotB')}`;
+            }
+            els.compareBody.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noComparisonYet')}</p>`;
             return;
         }
 
@@ -352,15 +434,11 @@ class ChartManager {
         // Render title with the same colors as the chart selections (blue/red).
         try {
             while (els.compareTitle.firstChild) els.compareTitle.removeChild(els.compareTitle.firstChild);
-            const aSpan = document.createElement('span');
-            aSpan.className = 'rubber-compare__name rubber-compare__name--a';
-            aSpan.textContent = this.i18nManager.localizeRubberName(a);
+            const aSpan = this._buildCompareNameNode('A', this.i18nManager.localizeRubberName(a));
             const vsSpan = document.createElement('span');
             vsSpan.className = 'rubber-compare__vs';
             vsSpan.textContent = 'vs';
-            const bSpan = document.createElement('span');
-            bSpan.className = 'rubber-compare__name rubber-compare__name--b';
-            bSpan.textContent = this.i18nManager.localizeRubberName(b);
+            const bSpan = this._buildCompareNameNode('B', this.i18nManager.localizeRubberName(b));
             els.compareTitle.appendChild(aSpan);
             els.compareTitle.appendChild(vsSpan);
             els.compareTitle.appendChild(bSpan);
@@ -413,9 +491,21 @@ class ChartManager {
             else {
                 const els = this.getRubberDetailsEls();
                 if (els) {
-                    els.compare.hidden = true;
-                    els.compareTitle.textContent = '';
-                    els.compareBody.innerHTML = '';
+                    els.compare.hidden = false;
+                    try {
+                        while (els.compareTitle.firstChild) els.compareTitle.removeChild(els.compareTitle.firstChild);
+                        const aSpan = this._buildCompareSlotNode('A');
+                        const vsSpan = document.createElement('span');
+                        vsSpan.className = 'rubber-compare__vs';
+                        vsSpan.textContent = 'vs';
+                        const bSpan = this._buildCompareSlotNode('B');
+                        els.compareTitle.appendChild(aSpan);
+                        els.compareTitle.appendChild(vsSpan);
+                        els.compareTitle.appendChild(bSpan);
+                    } catch {
+                        els.compareTitle.textContent = `${this.i18nManager.t('slotA')} vs ${this.i18nManager.t('slotB')}`;
+                    }
+                    els.compareBody.innerHTML = `<p class="rubber-placeholder">${this.i18nManager.t('noComparisonYet')}</p>`;
                 }
             }
         } catch {

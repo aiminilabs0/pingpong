@@ -55,6 +55,9 @@ chartManager.setActiveBrand(initialBrand);
 i18nManager.applyToDom();
 i18nManager.applyToChart(chart);
 
+// Show empty compare panel placeholders immediately (before any click).
+chartManager.clearRubberDetails();
+
 // Country select handler
 const countrySelect = document.getElementById('countrySelect');
 if (countrySelect) {
