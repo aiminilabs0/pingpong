@@ -54,6 +54,10 @@ function renderInline(raw) {
     out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     out = out.replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
 
+    // Allow a *tiny* whitelist of inline HTML, useful for tables: <br>, <br/>, <br />
+    // Note: we do this BEFORE restoring code spans so code keeps showing literal "<br>".
+    out = out.replace(/&lt;br\s*\/?&gt;/gi, '<br/>');
+
     // Restore code spans.
     out = out.replace(/\u0000C(\d+)\u0000/g, (_, n) => {
         const code = codeSpans[Number(n)] ?? '';
@@ -91,7 +95,10 @@ function parseTableAlign(sepLine, colCount) {
     return align;
 }
 
-function renderMarkdown(md) {
+function renderMarkdown(md, opts) {
+    const options = opts && typeof opts === 'object' ? opts : {};
+    const wrap = options.wrap !== false;
+
     const lines = String(md ?? '').replaceAll('\r\n', '\n').replaceAll('\r', '\n').split('\n');
     const out = [];
 
@@ -103,6 +110,21 @@ function renderMarkdown(md) {
         // Skip extra blank lines
         if (!trimmed) {
             i++;
+            continue;
+        }
+
+        // Blockquote (> ...)
+        if (/^\s*>/.test(line)) {
+            const buf = [];
+            while (i < lines.length) {
+                const ql = lines[i] ?? '';
+                if (!/^\s*>/.test(ql)) break;
+                // Remove one leading '>' and one optional following space.
+                buf.push(ql.replace(/^\s*>\s?/, ''));
+                i++;
+            }
+            const inner = renderMarkdown(buf.join('\n'), { wrap: false });
+            out.push(`<blockquote>${inner}</blockquote>`);
             continue;
         }
 
@@ -166,7 +188,7 @@ function renderMarkdown(md) {
                     return `<tr>${tds}</tr>`;
                 })
                 .join('');
-            out.push(`<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`);
+            out.push(`<div class="md-table"><table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`);
             continue;
         }
 
@@ -196,7 +218,8 @@ function renderMarkdown(md) {
         out.push(`<p>${renderInline(buf.join(' '))}</p>`);
     }
 
-    return out.join('\n');
+    const html = out.join('\n');
+    return wrap ? `<div class="md">${html}</div>` : html;
 }
 
 export { renderMarkdown };

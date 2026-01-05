@@ -40,6 +40,10 @@ const RUBBER_NAME_KO = {
     'MK': 'MK',
     'MK FX': 'MK FX',
     'MK Pro': 'MK Pro',
+    'MX-K': 'MX-K',
+    'MX-K(H)': 'MX-K(H)',
+    'MX-K Pro': 'MX-K Pro',
+    'MX-K(H) Pro': 'MX-K(H) Pro',
 
     // XIOM
     'C52.5': 'C52.5',
