@@ -142,6 +142,9 @@ class TooltipManager {
         const head = document.createElement('div');
         head.className = 'head';
 
+        const headLeft = document.createElement('div');
+        headLeft.className = 'head-left';
+
         const country = this.i18nManager.getCountry();
         const product = productUrlForPoint(r, country);
         const youtube = youtubeUrlForPoint(r, country);
@@ -166,12 +169,26 @@ class TooltipManager {
             title.textContent = titleText;
         }
 
-        // Optional: Best Seller badge
-        if (r && r.bestSeller) {
-            const badge = document.createElement('span');
-            badge.className = 'badge';
-            badge.textContent = this.i18nManager.t('tooltipBestSeller');
-            head.appendChild(badge);
+        // Optional: badges (Best Seller, Hot, etc.)
+        if (r && (r.bestSeller || r.hot)) {
+            const badges = document.createElement('div');
+            badges.className = 'badges';
+
+            if (r.bestSeller) {
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.textContent = this.i18nManager.t('tooltipBestSeller');
+                badges.appendChild(badge);
+            }
+
+            if (r.hot) {
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.textContent = this.i18nManager.t('tooltipHot');
+                badges.appendChild(badge);
+            }
+
+            headLeft.appendChild(badges);
         }
 
         const shopMeta = shopIconMetaForUrl(product, country, this.i18nManager);
@@ -197,8 +214,9 @@ class TooltipManager {
             actions.appendChild(aYt);
         }
 
-        // Order: title (left) then actions (right)
-        head.appendChild(title);
+        // Order: left (title + badges), then actions (right)
+        headLeft.appendChild(title);
+        head.appendChild(headLeft);
         head.appendChild(actions);
         this.tooltipEl.appendChild(head);
 

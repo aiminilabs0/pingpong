@@ -1053,6 +1053,19 @@ body {
     margin-bottom: 8px;
     border-bottom: 1px solid rgba(255,255,255,0.10);
 }
+.chart-tooltip .head-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.chart-tooltip .badges {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+}
 .chart-tooltip .actions {
     display: inline-flex;
     gap: 8px;
@@ -1079,7 +1092,7 @@ body {
     padding: 4px 8px;
     border-radius: 999px;
     line-height: 1;
-    margin-right: 6px;
+    margin-right: 0;
 }
 .chart-tooltip .row + .row {
     margin-top: 4px;

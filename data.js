@@ -2,6 +2,7 @@
 // Edit this file to add/modify rubbers without touching the chart logic/UI.
 // Optional fields per rubber:
 // - bestSeller: true   -> Draws a "B" inside the chart point marker.
+// - hot: true          -> Draws an "H" inside the chart point marker.
 
 // Rubber name localization (used by point labels + tooltip title)
 const RUBBER_NAME_KO = {
@@ -238,6 +239,7 @@ const butterflyRubbers = [
         y: 88,
         label: 'Zyre 03',
         shape: 'normal',
+        hot: true,
         productUrl: { kr: '', us: '' },
         youtubeUrl: { kr: 'https://www.youtube.com/watch?v=_U0m4EtsgZk', us: 'https://www.youtube.com/watch?v=8CAntgKhKO8' },
         arc: 96,

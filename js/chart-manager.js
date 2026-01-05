@@ -572,10 +572,10 @@ class ChartManager {
             }
         };
 
-        // Draw a "B" badge inside the point marker for best-seller rubbers.
-        // Enable by setting `bestSeller: true` on the rubber point object in `data.js`.
-        const bestSellerBadgePlugin = {
-            id: 'bestSellerBadgePlugin',
+        // Draw small badges inside the point marker (e.g., "B" for best-seller, "H" for hot).
+        // Enable by setting `bestSeller: true` and/or `hot: true` on the rubber point object in `data.js`.
+        const pointBadgePlugin = {
+            id: 'pointBadgePlugin',
             afterDatasetsDraw: (chart) => {
                 const ctx = chart?.ctx;
                 if (!ctx) return;
@@ -585,6 +585,15 @@ class ChartManager {
                 ctx.font = `900 ${CHART_BEST_SELLER_BADGE_FONT_SIZE}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+
+                const drawBadge = (text, x, y) => {
+                    // Subtle dark stroke to keep the white badge readable on bright fills.
+                    ctx.lineWidth = CHART_SELECTED_TEXT_STROKE_WIDTH;
+                    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+                    ctx.strokeText(text, x, y + 0.2);
+                    ctx.fillStyle = 'rgba(255,255,255,0.98)';
+                    ctx.fillText(text, x, y + 0.2);
+                };
 
                 const datasets = chart?.data?.datasets || [];
                 for (let di = 0; di < datasets.length; di++) {
@@ -597,7 +606,7 @@ class ChartManager {
 
                     for (let pi = 0; pi < data.length; pi++) {
                         const d = data[pi] || {};
-                        if (!d.bestSeller) continue;
+                        if (!d.bestSeller && !d.hot) continue;
                         const el = els[pi];
                         if (!el) continue;
 
@@ -606,12 +615,18 @@ class ChartManager {
                         const y = pos?.y;
                         if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
 
-                        // Subtle dark stroke to keep the white "B" readable on bright fills.
-                        ctx.lineWidth = CHART_SELECTED_TEXT_STROKE_WIDTH;
-                        ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-                        ctx.strokeText('B', x, y + 0.2);
-                        ctx.fillStyle = 'rgba(255,255,255,0.98)';
-                        ctx.fillText('B', x, y + 0.2);
+                        // If both badges are present, split them slightly so they stay readable.
+                        const hasB = !!d.bestSeller;
+                        const hasH = !!d.hot;
+                        if (hasB && hasH) {
+                            const dx = 3.3 * CHART_SCALE_20;
+                            drawBadge('B', x - dx, y);
+                            drawBadge('H', x + dx, y);
+                        } else if (hasB) {
+                            drawBadge('B', x, y);
+                        } else if (hasH) {
+                            drawBadge('H', x, y);
+                        }
                     }
                 }
 
@@ -620,7 +635,7 @@ class ChartManager {
         };
 
         // No circle highlight/halo: we highlight selections via label color instead.
-        return [overlayAlignPlugin, bestSellerBadgePlugin];
+        return [overlayAlignPlugin, pointBadgePlugin];
     }
 
     createChart() {
